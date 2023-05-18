@@ -83,10 +83,16 @@ namespace shaper {
     template<typename FloatType>
     class QuarticShaper : public Shaper<FloatType> {
     public:
-        void setParameters(FloatType) override {}
+        void setParameters(FloatType curve) override {
+            curve = -6 + 6 * curve;
+            a = (4 + curve) / 2;
+            b = -5 - curve;
+            c = (6 + curve) / 2;
+        }
 
     private:
-        FloatType basic(FloatType x) const override { return x * (1 + x * (3 + x * (-5 + 2 * x))); }
+        FloatType a, b, c;
+        FloatType basic(FloatType x) const override { return x * (1 + x * (c + x * (b + a * x))); }
 
         FloatType shape(FloatType x) const override { return basic(x); }
     };
