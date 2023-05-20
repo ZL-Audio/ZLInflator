@@ -145,7 +145,7 @@ namespace ZLDsp {
     public:
         auto static constexpr ID = "style1";
         auto static constexpr name = "1st Style";
-        inline auto static const choices = juce::StringArray{"Identity", "Quadratic", "Cubic", "Quartic", "Sigmod", "Sin"};
+        inline auto static const choices = juce::StringArray{"Identity", "Quadratic", "Cubic", "Quartic", "SigMOD", "SinMOD"};
         int static constexpr defaultI = 1;
     };
 
@@ -153,7 +153,7 @@ namespace ZLDsp {
     public:
         auto static constexpr ID = "style2";
         auto static constexpr name = "2nd Style";
-        inline auto static const choices = juce::StringArray{"Identity", "Quadratic", "Cubic", "Quartic", "Sigmod", "Sin"};
+        inline auto static const choices = juce::StringArray{"Identity", "Quadratic", "Cubic", "Quartic", "SigMOD", "SinMOD"};
         int static constexpr defaultI = 2;
     };
 }
