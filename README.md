@@ -1,4 +1,4 @@
-<img src="Docs/logo.svg" width=95%>
+<img src="Docs/logo.svg" width=50%>
 
 # ZLInflator
 
@@ -6,7 +6,7 @@ ZLInflator is a distortion/saturation plugin to increase loudness.
 
 ```mermaid
 flowchart LR
-A(Input Gain) -->O1(Over Sampling)-->D(Band Split)-->|Wet| B(wave-shaper) -->O2(Down Sampling) -->C(Output Gain)
+A(IN Gain) -->O1(Up Sampler)-->D(Band Spliter)-->|Wet| B(Wave Shaper) -->O2(Down Sampler) -->C(OUT Gain)
 D-->|1-Wet|O2
 ```
 
@@ -22,7 +22,7 @@ See the releases for the latest version.
 
 0. `git clone` this repo
 
-1. [Download CMAKE](https://cmake.org/download/) if you aren't already using it.
+1. [Download CMAKE](https://cmake.org/download/) if you do not have it.
 
 2. Populate the latest JUCE by running `git submodule update --init` in your repository directory.
 
