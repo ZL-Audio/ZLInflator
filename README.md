@@ -4,11 +4,11 @@
 
 ZLInflator is a distortion/saturation plugin to increase loudness.
 
-```mermaid
-flowchart LR
-A(IN Gain) -->O1(Up Sampler)-->D(Band Spliter)-->|Wet| B(Wave Shaper) -->O2(Down Sampler) -->C(OUT Gain)
-D-->|1-Wet|O2
-```
+<img src="Docs/screenshot.png" width=100%>
+
+## Usage
+
+See the wiki for details.
 
 ## Download
 
