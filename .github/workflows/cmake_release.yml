@@ -13,7 +13,7 @@ concurrency:
 
 env:
   PROJECT_NAME: "ZLInflator"
-  PRODUCT_NAME: "ZL Inflator
+  PRODUCT_NAME: "ZL Inflator"
   BUILD_TYPE: Release
   BUILD_DIR: Builds
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
