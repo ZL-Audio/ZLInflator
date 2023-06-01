@@ -8,7 +8,7 @@
 ArchitecturesInstallIn64BitMode=x64
 ArchitecturesAllowed=x64
 AppName={#PluginName}
-OutputBaseFilename={#PluginName}
+OutputBaseFilename={#PluginName}-{#Version}
 AppCopyright=Copyright (C) {#Year} {#Publisher}
 AppPublisher={#Publisher}
 AppVersion={#Version}

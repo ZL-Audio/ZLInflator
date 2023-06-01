@@ -106,6 +106,7 @@ jobs:
         echo "VST3_PATH=${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}/VST3/${{ env.PRODUCT_NAME }}.vst3" >> $GITHUB_ENV
         echo "AU_PATH=${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}/AU/${{ env.PRODUCT_NAME }}.component" >> $GITHUB_ENV
         echo "AUV3_PATH=${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}/AUv3/${{ env.PRODUCT_NAME }}.appex" >> $GITHUB_ENV
+        echo "INSTALLER_NAME=${{ env.PROJECT_NAME }}-$VERSION" >> $GITHUB_ENV
 
     - name: ccache
       uses: hendrikmuhs/ccache-action@v1.2
@@ -158,40 +159,40 @@ jobs:
         mv "${{ env.ARTIFACTS_PATH }}/AU/${{ env.PRODUCT_NAME }}.component" packaging/dmg
         
         # Run appdmg to create the .dmg
-        cd packaging && appdmg dmg.json "${{ env.PRODUCT_NAME}}.dmg"
+        cd packaging && appdmg dmg.json "${{ env.INSTALLER_NAME}}.dmg"
 
     - name: Zip
       if: ${{ matrix.name == 'Linux' }}
       working-directory: ${{ env.ARTIFACTS_PATH }}
-      run: 7z a -tzip ${{ env.PROJECT_NAME }}.zip .
+      run: 7z a -tzip ${{ env.INSTALLER_NAME }}.zip .
 
     - name: Generate Installer (Windows)
       if: ${{ matrix.name == 'Windows' }}
       shell: bash
       run: |
         iscc "packaging\installer.iss"
-        mv "packaging/Output/${{ env.PRODUCT_NAME }}.exe" "${{ env.ARTIFACTS_PATH }}/"
+        mv "packaging/Output/${{ env.INSTALLER_NAME }}.exe" "${{ env.ARTIFACTS_PATH }}/"
 
     - name: Upload Exe (Windows)
       if: ${{ matrix.name == 'Windows' }}
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.PRODUCT_NAME }}.exe
-        path: '${{ env.ARTIFACTS_PATH }}/${{ env.PRODUCT_NAME }}.exe'
+        name: ${{ env.INSTALLER_NAME }}.exe
+        path: '${{ env.ARTIFACTS_PATH }}/${{ env.INSTALLER_NAME }}.exe'
 
     - name: Upload Zip (Linux)
       if: ${{ matrix.name == 'Linux' }}
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.PROJECT_NAME }}.zip
-        path: '${{ env.ARTIFACTS_PATH }}/${{ env.PROJECT_NAME }}.zip'
+        name: ${{ env.INSTALLER_NAME }}.zip
+        path: '${{ env.ARTIFACTS_PATH }}/${{ env.INSTALLER_NAME }}.zip'
 
     - name: Upload DMG (MacOS)
       if: ${{ matrix.name == 'macOS' }}
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.PRODUCT_NAME }}.dmg
-        path: packaging/${{ env.PRODUCT_NAME }}.dmg
+        name: ${{ env.INSTALLER_NAME }}.dmg
+        path: packaging/${{ env.INSTALLER_NAME }}.dmg
 
 
   release:
