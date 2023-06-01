@@ -63,7 +63,7 @@ juce_add_plugin("${PROJECT_NAME}"
         VST3_CATEGORIES Distortion
         AU_MAIN_TYPE kAudioUnitType_Effect
         FORMATS VST3 AU               # The formats to build. Other valid formats are: VST3 AAX Unity VST AU AUv3
-        PRODUCT_NAME "ZLInflator")        # The name of the final executable, which can differ from the target name
+        PRODUCT_NAME "ZL Inflator")        # The name of the final executable, which can differ from the target name
 
 # C++20, please
 target_compile_features("${PROJECT_NAME}" PRIVATE cxx_std_20)
