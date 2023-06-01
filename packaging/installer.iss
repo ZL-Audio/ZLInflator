@@ -1,3 +1,4 @@
+#define Version Trim(FileRead(FileOpen("..\VERSION")))
 #define PluginName "ZL Inflator"
 #define ProjectName "ZLInflator"
 #define Publisher "ZL"
