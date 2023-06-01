@@ -1,5 +1,5 @@
 #define Version Trim(FileRead(FileOpen("..\VERSION")))
-#define PluginName "ZLInflator"
+#define PluginName "ZL Inflator"
 #define Publisher "ZL"
 #define Year GetDateTimeString("2023","","")
 

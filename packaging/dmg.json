@@ -1,5 +1,5 @@
 {
-  "title": "ZLInflator",
+  "title": "ZL Inflator",
   "window": {
     "position": {
       "x": 100,
@@ -12,9 +12,9 @@
   },
   "format": "UDZO",
   "contents": [
-    { "x": 250, "y": 245, "type": "file", "path": "dmg/ZLInflator.component" },
+    { "x": 250, "y": 245, "type": "file", "path": "dmg/ZL\ Inflator.component" },
     { "x": 480, "y": 245, "type": "file", "path": "dmg/Your Mac's Component Folder" },
-    { "x": 250, "y": 405, "type": "file", "path": "dmg/ZLInflator.vst3" },
+    { "x": 250, "y": 405, "type": "file", "path": "dmg/ZL\ Inflator.vst3" },
     { "x": 480, "y": 405, "type": "file", "path": "dmg/Your Mac's VST3 Folder" }
   ]
 }

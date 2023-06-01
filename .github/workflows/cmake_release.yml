@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PROJECT_NAME: ZLInflator
+  PROJECT_NAME: ZL Inflator
   BUILD_TYPE: Release
   BUILD_DIR: Builds
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
