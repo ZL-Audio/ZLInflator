@@ -163,7 +163,7 @@ jobs:
     - name: Zip
       if: ${{ matrix.name == 'Linux' }}
       working-directory: ${{ env.ARTIFACTS_PATH }}
-      run: 7z a -tzip ${{ env.PRODUCT_NAME }}.zip .
+      run: 7z a -tzip ${{ env.PROJECT_NAME }}.zip .
 
     - name: Generate Installer (Windows)
       if: ${{ matrix.name == 'Windows' }}
@@ -183,8 +183,8 @@ jobs:
       if: ${{ matrix.name == 'Linux' }}
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.PRODUCT_NAME }}.zip
-        path: '${{ env.ARTIFACTS_PATH }}/${{ env.PRODUCT_NAME }}.zip'
+        name: ${{ env.PROJECT_NAME }}.zip
+        path: '${{ env.ARTIFACTS_PATH }}/${{ env.PROJECT_NAME }}.zip'
 
     - name: Upload DMG (MacOS)
       if: ${{ matrix.name == 'macOS' }}
