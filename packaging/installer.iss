@@ -1,4 +1,3 @@
-#define Version Trim(FileRead(FileOpen("..\VERSION")))
 #define PluginName "ZL Inflator"
 #define ProjectName "ZLInflator"
 #define Publisher "ZL"
@@ -8,7 +7,7 @@
 ArchitecturesInstallIn64BitMode=x64
 ArchitecturesAllowed=x64
 AppName={#PluginName}
-OutputBaseFilename={#PluginName}-{#Version}-Windows
+OutputBaseFilename={#PluginName}-Windows
 AppCopyright=Copyright (C) {#Year} {#Publisher}
 AppPublisher={#Publisher}
 AppVersion={#Version}
