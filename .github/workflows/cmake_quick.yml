@@ -1,4 +1,4 @@
-name: Quick Release
+name: Release
 
 permissions:
   contents: write
@@ -12,7 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PROJECT_NAME: "ZL Inflator"
+  PROJECT_NAME: "ZLInflator"
+  PRODUCT_NAME: "ZL Inflator"
   BUILD_TYPE: Release
   BUILD_DIR: Builds
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -102,10 +103,9 @@ jobs:
       run: |
         VERSION=$(cat VERSION)
         echo "ARTIFACTS_PATH=${{ env.BUILD_DIR }}/${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}" >> $GITHUB_ENV
-        echo "VST3_PATH=${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}/VST3/${{ env.PROJECT_NAME }}.vst3" >> $GITHUB_ENV
-        echo "AU_PATH=${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}/AU/${{ env.PROJECT_NAME }}.component" >> $GITHUB_ENV
-        echo "AUV3_PATH=${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}/AUv3/${{ env.PROJECT_NAME }}.appex" >> $GITHUB_ENV
-        echo "PRODUCT_NAME=${{ env.PROJECT_NAME }}-$VERSION-${{ matrix.name }}" >> $GITHUB_ENV
+        echo "VST3_PATH=${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}/VST3/${{ env.PRODUCT_NAME }}.vst3" >> $GITHUB_ENV
+        echo "AU_PATH=${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}/AU/${{ env.PRODUCT_NAME }}.component" >> $GITHUB_ENV
+        echo "AUV3_PATH=${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}/AUv3/${{ env.PRODUCT_NAME }}.appex" >> $GITHUB_ENV
 
     - name: ccache
       uses: hendrikmuhs/ccache-action@v1.2
@@ -133,8 +133,8 @@ jobs:
       if: ${{ matrix.name == 'macOS' }}
       run: |
         # Each plugin must be code signed
-        codesign --force -s "${{ secrets.DEV_ID_APPLICATION}}" -v ${{ env.VST3_PATH }} --deep --strict --options=runtime --timestamp
-        codesign --force -s "${{ secrets.DEV_ID_APPLICATION}}" -v ${{ env.AU_PATH }} --deep --strict --options=runtime --timestamp
+        codesign --force -s "${{ secrets.DEV_ID_APPLICATION}}" -v "${{ env.VST3_PATH }}" --deep --strict --options=runtime --timestamp
+        codesign --force -s "${{ secrets.DEV_ID_APPLICATION}}" -v "${{ env.AU_PATH }}" --deep --strict --options=runtime --timestamp
 
     - name: Create DMG (macOS)
       if: ${{ matrix.name == 'macOS' }}
@@ -146,16 +146,16 @@ jobs:
         sudo mkdir -m 755 -p /Library/Audio/Plug-Ins/Components && sudo mkdir -m 755 -p /Library/Audio/Plug-Ins/VST3
         ln -s /Library/Audio/Plug-Ins/Components "packaging/dmg/Your Mac's Component folder"
         ln -s /Library/Audio/Plug-Ins/VST3 "packaging/dmg/Your Mac's VST3 folder"
-        mv "${{ env.ARTIFACTS_PATH }}/VST3/${{ env.PROJECT_NAME }}.vst3" packaging/dmg
-        mv "${{ env.ARTIFACTS_PATH }}/AU/${{ env.PROJECT_NAME }}.component" packaging/dmg
+        mv "${{ env.ARTIFACTS_PATH }}/VST3/${{ env.PRODUCT_NAME }}.vst3" packaging/dmg
+        mv "${{ env.ARTIFACTS_PATH }}/AU/${{ env.PRODUCT_NAME }}.component" packaging/dmg
         
         # Run appdmg to create the .dmg
-        cd packaging && appdmg dmg.json ${{ env.PRODUCT_NAME}}.dmg
+        cd packaging && appdmg dmg.json "${{ env.PRODUCT_NAME}}.dmg"
 
     - name: Zip
       if: ${{ matrix.name == 'Linux' }}
       working-directory: ${{ env.ARTIFACTS_PATH }}
-      run: 7z a -tzip ${{ env.PRODUCT_NAME }}.zip .
+      run: 7z a -tzip ${{ env.PROJECT_NAME }}.zip .
 
     - name: Generate Installer (Windows)
       if: ${{ matrix.name == 'Windows' }}
@@ -175,8 +175,8 @@ jobs:
       if: ${{ matrix.name == 'Linux' }}
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.PRODUCT_NAME }}.zip
-        path: '${{ env.ARTIFACTS_PATH }}/${{ env.PRODUCT_NAME }}.zip'
+        name: ${{ env.PROJECT_NAME }}.zip
+        path: '${{ env.ARTIFACTS_PATH }}/${{ env.PROJECT_NAME }}.zip'
 
     - name: Upload DMG (MacOS)
       if: ${{ matrix.name == 'macOS' }}

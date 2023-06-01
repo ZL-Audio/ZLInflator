@@ -57,7 +57,7 @@ namespace ZLDsp {
         auto static constexpr ID = "curve1";
         auto static constexpr name = "Curve (%)";
         inline auto static const range = juce::NormalisableRange<float>(0.0f, 100.0f, 0.1f);
-        auto static constexpr defaultV = 50.0f;
+        auto static constexpr defaultV = 25.0f;
         static float formatV(float v) {
             return v / 100.f;
         }
@@ -68,7 +68,7 @@ namespace ZLDsp {
         auto static constexpr ID = "curve2";
         auto static constexpr name = "Curve (%)";
         inline auto static const range = juce::NormalisableRange<float>(0.0f, 100.0f, 0.1f);
-        auto static constexpr defaultV = 50.0f;
+        auto static constexpr defaultV = 25.0f;
         static float formatV(float v) {
             return v / 100.f;
         }
@@ -146,7 +146,7 @@ namespace ZLDsp {
         auto static constexpr ID = "style1";
         auto static constexpr name = "1st Style";
         inline auto static const choices = juce::StringArray{"Identity", "Quadratic", "Cubic", "Quartic", "SigMOD", "SinMOD"};
-        int static constexpr defaultI = 1;
+        int static constexpr defaultI = 3;
     };
 
     class style2 : public ChoiceParameters<style2> {
@@ -154,7 +154,7 @@ namespace ZLDsp {
         auto static constexpr ID = "style2";
         auto static constexpr name = "2nd Style";
         inline auto static const choices = juce::StringArray{"Identity", "Quadratic", "Cubic", "Quartic", "SigMOD", "SinMOD"};
-        int static constexpr defaultI = 2;
+        int static constexpr defaultI = 1;
     };
 }
 
