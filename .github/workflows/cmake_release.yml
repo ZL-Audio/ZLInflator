@@ -141,8 +141,8 @@ jobs:
       if: ${{ matrix.name == 'macOS' }}
       run: |
         # Each plugin must be code signed
-        codesign --force -s "${{ secrets.DEV_ID_APPLICATION}}" -v ${{ env.VST3_PATH }} --deep --strict --options=runtime --timestamp
-        codesign --force -s "${{ secrets.DEV_ID_APPLICATION}}" -v ${{ env.AU_PATH }} --deep --strict --options=runtime --timestamp
+        codesign --force -s "${{ secrets.DEV_ID_APPLICATION}}" -v "${{ env.VST3_PATH }}" --deep --strict --options=runtime --timestamp
+        codesign --force -s "${{ secrets.DEV_ID_APPLICATION}}" -v "${{ env.AU_PATH }}" --deep --strict --options=runtime --timestamp
 
     - name: Create DMG (macOS)
       if: ${{ matrix.name == 'macOS' }}
@@ -158,7 +158,7 @@ jobs:
         mv "${{ env.ARTIFACTS_PATH }}/AU/${{ env.PROJECT_NAME }}.component" packaging/dmg
         
         # Run appdmg to create the .dmg
-        cd packaging && appdmg dmg.json ${{ env.PRODUCT_NAME}}.dmg
+        cd packaging && appdmg dmg.json "${{ env.PRODUCT_NAME}}.dmg"
 
     - name: Zip
       if: ${{ matrix.name == 'Linux' }}

@@ -1,5 +1,6 @@
 #define Version Trim(FileRead(FileOpen("..\VERSION")))
 #define PluginName "ZL Inflator"
+#define ProjectName "ZLInflator"
 #define Publisher "ZL"
 #define Year GetDateTimeString("2023","","")
 
@@ -21,7 +22,7 @@ Type: filesandordirs; Name: "{commoncf64}\VST3\{#PluginName}Data"
 
 ; MSVC adds a .ilk when building the plugin. Let's not include that.
 [Files]
-Source: "..\Builds\{#PluginName}_artefacts\Release\VST3\{#PluginName}.vst3\*"; DestDir: "{commoncf64}\VST3\{#PluginName}.vst3\"; Excludes: *.ilk; Flags: ignoreversion recursesubdirs;
+Source: "..\Builds\{#ProjectName}_artefacts\Release\VST3\{#PluginName}.vst3\*"; DestDir: "{commoncf64}\VST3\{#PluginName}.vst3\"; Excludes: *.ilk; Flags: ignoreversion recursesubdirs;
 
 [Run]
 Filename: "{cmd}"; \
