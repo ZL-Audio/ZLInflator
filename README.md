@@ -39,7 +39,7 @@ JUCE framework from [JUCE](https://github.com/juce-framework/JUCE)
 JUCE template from [pamplejuce](https://github.com/sudara/pamplejuce)
 
 Algorithm inspired by [RCJacH](
-https://github.com/RCJacH/ReaScripts/blob/master/JSFX/Audio/ZLInflator.jsfx), [lewloiwc, sai'ke and BethHarmon](
+https://github.com/RCJacH/ReaScripts/blob/master/JSFX/Audio/RCInflator.jsfx), [lewloiwc, sai'ke and BethHarmon](
 https://forum.cockos.com/showthread.php?t=256286)
 
 Font from CMU Open Sans, Font Awesome and MiSans.
