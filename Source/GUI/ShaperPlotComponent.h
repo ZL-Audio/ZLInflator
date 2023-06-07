@@ -32,8 +32,17 @@ public:
         g.fillAll(ZLInterface::BackgroundColor);
         g.setColour(ZLInterface::TextInactiveColor);
         g.drawRect(getLocalBounds().toFloat(), thickNess);
-        juce::Path path;
+
         auto bound = getLocalBounds().toFloat();
+
+        juce::Path path0;
+        path0.startNewSubPath(getPointX(0, bound), getPointY(0, bound));
+        path0.lineTo(getPointX(1, bound), getPointY(1, bound));
+        g.setColour(ZLInterface::TextHideColor);
+        g.strokePath(path0, juce::PathStrokeType(thickNess, juce::PathStrokeType::curved));
+
+
+        juce::Path path;
         path.startNewSubPath(getPointX(0, bound), getPointY(0, bound));
         for (int i = static_cast<int>(bound.getX()); i < static_cast<int>(bound.getX() + bound.getWidth()); ++i) {
             auto x = getValueX(static_cast<float>(i), bound);
