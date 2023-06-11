@@ -58,7 +58,7 @@ juce_add_plugin("${PROJECT_NAME}"
         EDITOR_WANTS_KEYBOARD_FOCUS TRUE    # Does the editor need keyboard focus?
         COPY_PLUGIN_AFTER_BUILD TRUE        # Should the plugin be installed to a default location after building?
         PLUGIN_MANUFACTURER_CODE Zliu               # A four-character manufacturer id with at least one upper-case character
-        PLUGIN_CODE Dem0                            # A unique four-character plugin id with exactly one upper-case character
+        PLUGIN_CODE Zlin                            # A unique four-character plugin id with exactly one upper-case character
         # GarageBand 10.3 requires the first letter to be upper-case, and the remaining letters to be lower-case
         VST3_CATEGORIES Distortion
         AU_MAIN_TYPE kAudioUnitType_Effect
