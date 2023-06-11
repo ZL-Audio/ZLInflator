@@ -84,16 +84,13 @@ public:
         }
     }
 
-    void update(const unsigned int factor) {
-        if (factor != oldFactor) {
-            oldFactor = factor;
-            auto rate = (unsigned int) std::pow(2.0, factor);
-            juce::dsp::ProcessSpec spec{dupSpec.sampleRate * rate,
-                                        dupSpec.numChannels,
-                                        dupSpec.maximumBlockSize * rate};
-            for (auto &f: filters) {
-                f.prepare(spec);
-            }
+    void update(const int factor) {
+        auto rate = static_cast<int> (std::pow(2.0, factor));
+        juce::dsp::ProcessSpec spec{dupSpec.sampleRate * rate,
+                                    dupSpec.numChannels,
+                                    dupSpec.maximumBlockSize * rate};
+        for (auto &f: filters) {
+            f.prepare(spec);
         }
     }
 
@@ -122,7 +119,6 @@ public:
     }
 
 private:
-    std::atomic<unsigned int> oldFactor = 0;
     std::array<juce::dsp::LinkwitzRileyFilter<FloatType>, 3> filters{};
     juce::dsp::LinkwitzRileyFilter<FloatType> low, high, all;
     juce::dsp::ProcessSpec dupSpec{44100, 0, 2};
@@ -161,6 +157,9 @@ public:
 
     void setOverSampleFactor(int overSampleFactor) {
         idxSampler = static_cast<size_t>(std::min(overSampleFactor, numSamplers - 1));
+        for (size_t i = 0; i < numBands - 1; ++i) {
+            filters[i].update(overSampleFactor);
+        }
     }
 
     void setTypes(size_t type1, size_t type2) {
