@@ -22,6 +22,7 @@ public:
 
     void setFontSize(float size) {
         fontSize = size;
+        cornerSize = fontSize * 0.5f;
     }
 
     void drawMeters(juce::Graphics &g, const juce::Rectangle<float> &bounds,
@@ -30,9 +31,9 @@ public:
                     const std::vector<float> &peakMax) {
 
         auto bound = bounds.toFloat();
-        bound = bound.withSizeKeepingCentre(0.85f * bound.getWidth(),
-                                            bound.getHeight() - 0.15f * bound.getWidth());
-        drawMeterBackground(g, bound);
+        bound = ZLInterface::fillRoundedShadowRectangle(g, bound, fontSize * 0.5f);
+        ZLInterface::fillRoundedInnerShadowRectangle(g, bound, fontSize * 0.5f, fontSize * 0.15f,
+                                                     true, true, true, true, true);
         auto numberBound = bound;
 
         auto meterWidth = bound.getWidth() / static_cast<float>(rms.size());
@@ -70,11 +71,6 @@ private:
     float fontSize = 0.0f, minRMS = -24.0f, maxRMS = 0.0f;
     float cornerSize;
 
-    void drawMeterBackground(juce::Graphics &g, const juce::Rectangle<float> &bound) {
-        cornerSize = fontSize * 0.5f;
-        ZLInterface::fillRoundedRectangle(g, bound, cornerSize);
-    }
-
     void drawMeterPeakMax(juce::Graphics &g, float peakMax, const juce::Rectangle<float> &bound) {
         if (peakMax > 0) {
             g.setColour(ZLInterface::TextColor);
@@ -82,7 +78,7 @@ private:
             g.setColour(ZLInterface::TextInactiveColor);
         }
         if (fontSize > 0) {
-            g.setFont(fontSize * ZLInterface::FontSmall);
+            g.setFont(fontSize * ZLInterface::FontTiny);
         } else {
             g.setFont(bound.getHeight() * 0.6f);
         }

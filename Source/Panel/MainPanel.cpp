@@ -31,10 +31,10 @@ MainPanel::~MainPanel() = default;
 void MainPanel::paint(juce::Graphics &g) {
     g.fillAll(ZLInterface::BackgroundColor);
     auto bound = getLocalBounds().toFloat();
-    auto padding = bound.getHeight() * 0.05f;
-    bound = bound.withSizeKeepingCentre(bound.getWidth() - padding, bound.getHeight() - padding);
-    float cornerSize = bound.getHeight() * 0.03f;
-    ZLInterface::fillRoundedRectangle(g, bound, cornerSize);
+    float fontSize = bound.getHeight() * 0.045f;
+    bound = ZLInterface::fillRoundedShadowRectangle(g, bound, fontSize * 0.5f);
+    ZLInterface::fillRoundedInnerShadowRectangle(g, bound, fontSize * 0.5f, fontSize * 0.15f,
+                                                 true, true, true, true, true);
 }
 
 void MainPanel::resized() {
@@ -61,8 +61,6 @@ void MainPanel::resized() {
     auto padding = bound.getHeight() * 0.08f;
     bound = bound.withSizeKeepingCentre(bound.getWidth() - padding, bound.getHeight() - padding);
     grid.performLayout(bound.toNearestInt());
-
-
 }
 
 void MainPanel::setFontSize(float size) {

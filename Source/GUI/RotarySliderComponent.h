@@ -1,15 +1,3 @@
-/*
-==============================================================================
-Copyright (C) 2023 - zsliu98
-This file is part of ZLInflator
-
-ZLInflator is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-ZLInflator is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with ZLInflator. If not, see <https://www.gnu.org/licenses/>.
-==============================================================================
-*/
-
 #ifndef ZLINFLATOR_ROTARYSLIDERCOMPONENT_H
 #define ZLINFLATOR_ROTARYSLIDERCOMPONENT_H
 
@@ -20,46 +8,54 @@ You should have received a copy of the GNU General Public License along with ZLI
 
 class RotarySliderComponent : public juce::Component {
 public:
-
-    explicit RotarySliderComponent(const juce::String &labelText) :
-            myLookAndFeel() {
+    explicit RotarySliderComponent (const juce::String& labelText) : myLookAndFeel() {
         // setup slider
-        slider.setSliderStyle(juce::Slider::Rotary);
-        slider.setTextBoxIsEditable(false);
-        slider.setDoubleClickReturnValue(true, 0.0);
-        slider.setLookAndFeel(&myLookAndFeel);
-        addAndMakeVisible(slider);
+        slider.setSliderStyle (juce::Slider::Rotary);
+        slider.setTextBoxIsEditable (false);
+        slider.setDoubleClickReturnValue (true, 0.0);
+        slider.setLookAndFeel (&myLookAndFeel);
+        slider.setScrollWheelEnabled (true);
+        addAndMakeVisible (slider);
 
         // setup label
-        label.setText(labelText, juce::dontSendNotification);
-        label.setLookAndFeel(&nameLookAndFeel);
-        addAndMakeVisible(label);
+        label.setText (labelText, juce::dontSendNotification);
+        label.setLookAndFeel (&nameLookAndFeel);
+        addAndMakeVisible (label);
+    }
+
+    ~RotarySliderComponent() override  {
+        slider.setLookAndFeel(nullptr);
+        label.setLookAndFeel(nullptr);
     }
 
     void resized() override {
         auto bound = getLocalBounds().toFloat();
-        auto boundMinWH = juce::jmin(bound.getWidth(), bound.getHeight() - fontSize * ZLInterface::FontHuge);
-        bound = bound.withSizeKeepingCentre(boundMinWH, boundMinWH + fontSize * ZLInterface::FontHuge);
-        auto textBound = bound.removeFromTop(fontSize * ZLInterface::FontHuge);
-        label.setBounds(textBound.toNearestInt());
+        auto boundMinWH = juce::jmin (bound.getWidth(), bound.getHeight() - fontSize * ZLInterface::FontHuge);
+        bound = bound.withSizeKeepingCentre (boundMinWH, boundMinWH + fontSize * ZLInterface::FontHuge);
+        auto textBound = bound.removeFromTop (fontSize * ZLInterface::FontHuge);
+        label.setBounds (textBound.toNearestInt());
         auto bounds = bound;
-        auto radius = juce::jmin(sliderHeight * bounds.getWidth(), sliderHeight * bounds.getHeight());
-        auto buttonBounds = bounds.withSizeKeepingCentre(radius, radius);
-        slider.setBounds(buttonBounds.toNearestInt());
+        auto radius = juce::jmin (bounds.getWidth(), bounds.getHeight()) * 0.9f;
+        auto buttonBounds = bounds.withSizeKeepingCentre (radius, radius);
+        slider.setBounds (buttonBounds.toNearestInt());
     }
 
-    void paint(juce::Graphics &g) override {
-        g.fillAll(ZLInterface::BackgroundColor);
-    }
+    void paint (juce::Graphics& g) override {}
 
-    juce::Slider &getSlider() { return slider; }
+    juce::Slider& getSlider() { return slider; }
 
-    juce::Label &getLabel() { return label; }
+    juce::Label& getLabel() { return label; }
 
-    void setFontSize(float size) {
+    void setFontSize (float size) {
         fontSize = size;
-        myLookAndFeel.setFontSize(size);
-        nameLookAndFeel.setFontSize(size);
+        myLookAndFeel.setFontSize (size);
+        nameLookAndFeel.setFontSize (size);
+    }
+
+    void setEditable (bool f) {
+        myLookAndFeel.setEditable(f);
+        nameLookAndFeel.setEditable(f);
+        repaint();
     }
 
 private:
