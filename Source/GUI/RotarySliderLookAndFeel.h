@@ -28,7 +28,12 @@ public:
                 -0.5f * arrowUnit + bounds.getCentreY() +
                 (0.5f * diameter - 0.5f * arrowUnit) * (-std::cos(rotationAngle)),
                 arrowUnit, arrowUnit);
-        arrowBound = arrowBound.withSizeKeepingCentre(arrowBound.getWidth(), arrowBound.getHeight());
+        auto arrowStartBound = juce::Rectangle<float>(
+                -0.5f * arrowUnit + bounds.getCentreX() +
+                (0.5f * diameter - 0.5f * arrowUnit) * std::sin(rotaryStartAngle),
+                -0.5f * arrowUnit + bounds.getCentreY() +
+                (0.5f * diameter - 0.5f * arrowUnit) * (-std::cos(rotaryStartAngle)),
+                arrowUnit, arrowUnit);
         juce::Path mask;
         mask.addEllipse(bounds);
         mask.setUsingNonZeroWinding(false);
@@ -38,6 +43,17 @@ public:
         ZLInterface::drawShadowEllipse(g, arrowBound, fontSize * 0.5f,
                                        ZLInterface::BackgroundColor,
                                        false, false, true);
+        ZLInterface::drawShadowEllipse(g, arrowStartBound, fontSize * 0.5f,
+                                       ZLInterface::TextHideColor,
+                                       false, false, true);
+
+        juce::Path filling;
+        filling.addPieSegment(bounds, rotaryStartAngle, rotationAngle, 0);
+        filling.setUsingNonZeroWinding(false);
+        filling.addPieSegment(arrowStartBound, rotaryStartAngle, rotaryStartAngle + juce::MathConstants<float>::pi,
+                              0);
+        g.setColour(ZLInterface::TextHideColor);
+        g.fillPath(filling);
         ZLInterface::drawInnerShadowEllipse(g, arrowBound, fontSize * 0.15f, true);
         g.restoreState();
     }
