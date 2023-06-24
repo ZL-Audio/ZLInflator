@@ -137,6 +137,12 @@ namespace ZLInterface {
         }
         path.addEllipse(boxBounds);
         auto offset = static_cast<int>(cornerSize * 0.5f);
+        juce::Path mask;
+        mask.addEllipse(boxBounds.withSizeKeepingCentre(boxBounds.getWidth() * 3, boxBounds.getHeight() * 3));
+        mask.setUsingNonZeroWinding(false);
+        mask.addEllipse(boxBounds);
+        g.saveState();
+        g.reduceClipRegion(mask);
         if (drawDark) {
             juce::DropShadow darkShadow(ZLInterface::DarkShadowColor, radius,
                                         {offset, offset});
@@ -147,6 +153,7 @@ namespace ZLInterface {
                                           {-offset, -offset});
             brightShadow.drawForPath(g, path);
         }
+        g.restoreState();
         g.setColour(mainColour);
         g.fillPath(path);
         return boxBounds;
