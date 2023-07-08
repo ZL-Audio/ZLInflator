@@ -205,7 +205,7 @@ public:
     void process(const ProcessContext &context) noexcept {
         const auto numSamples = context.getInputBlock().getNumSamples();
         const auto numChannels = context.getInputBlock().getNumChannels();
-        if (context.isBypassed || !effect) {
+        if (context.isBypassed) {
             if (context.usesSeparateInputAndOutputBlocks())
                 context.getOutputBlock().copyFrom(context.getInputBlock());
         } else {
@@ -237,10 +237,12 @@ public:
                 filters[1].processLow(contexts[1]);
                 filters[1].processHigh(contexts[2]);
 
-                for (size_t i = 0; i < numBands; ++i) {
-                    juce::dsp::AudioBlock<FloatType>::process(
-                            contexts[i].getInputBlock(), contexts[i].getOutputBlock(),
-                            helper);
+                if (effect.load()) {
+                    for (size_t i = 0; i < numBands; ++i) {
+                        juce::dsp::AudioBlock<FloatType>::process(
+                                contexts[i].getInputBlock(), contexts[i].getOutputBlock(),
+                                helper);
+                    }
                 }
 
                 for (size_t i = 1; i < numBands; ++i) {
@@ -249,9 +251,11 @@ public:
 
                 oversampled_context.getOutputBlock().copyFrom(blocks[0]);
             } else {
-                juce::dsp::AudioBlock<FloatType>::process(
-                        oversampled_context.getInputBlock(),
-                        oversampled_context.getOutputBlock(), helper);
+                if (effect.load()) {
+                    juce::dsp::AudioBlock<FloatType>::process(
+                            oversampled_context.getInputBlock(),
+                            oversampled_context.getOutputBlock(), helper);
+                }
             }
             overSamplers[idxSampler]->processSamplesDown(context.getOutputBlock());
         }
@@ -295,27 +299,11 @@ public:
         apvts = &parameters;
     }
 
-    void addParameters() {
+    void addListeners() {
         std::array IDs{ZLDsp::effectIn::ID, ZLDsp::style1::ID, ZLDsp::style2::ID,
                        ZLDsp::wet::ID, ZLDsp::curve1::ID, ZLDsp::curve2::ID, ZLDsp::weight::ID,
                        ZLDsp::bandSplit::ID, ZLDsp::lowSplit::ID, ZLDsp::highSplit::ID,
                        ZLDsp::overSample::ID};
-        apvts->createAndAddParameter(ZLDsp::effectIn::get());
-        apvts->createAndAddParameter(ZLDsp::style1::get());
-        apvts->createAndAddParameter(ZLDsp::style2::get());
-
-        apvts->createAndAddParameter(ZLDsp::wet::get());
-
-        apvts->createAndAddParameter(ZLDsp::curve1::get());
-        apvts->createAndAddParameter(ZLDsp::curve2::get());
-        apvts->createAndAddParameter(ZLDsp::weight::get());
-
-        apvts->createAndAddParameter(ZLDsp::bandSplit::get());
-        apvts->createAndAddParameter(ZLDsp::lowSplit::get());
-        apvts->createAndAddParameter(ZLDsp::highSplit::get());
-
-        apvts->createAndAddParameter(ZLDsp::overSample::get());
-
         for (auto &ID: IDs) {
             apvts->addParameterListener(ID, this);
         }

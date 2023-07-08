@@ -156,6 +156,16 @@ namespace ZLDsp {
         inline auto static const choices = juce::StringArray{"Identity", "Quadratic", "Cubic", "Quartic", "SigMOD", "SinMOD"};
         int static constexpr defaultI = 1;
     };
+
+    inline juce::AudioProcessorValueTreeState::ParameterLayout getParameterLayout() {
+        juce::AudioProcessorValueTreeState::ParameterLayout layout;
+        layout.add(inputGain::get(), outputGain::get(), wet::get(),
+                   curve1::get(), curve2::get(), weight::get(),
+                   lowSplit::get(), highSplit::get(),
+                   effectIn::get(), bandSplit::get(),
+                   overSample::get(), style1::get(), style2::get());
+        return layout;
+    }
 }
 
 #endif //ZLINFLATOR_DSP_DEFINES_H

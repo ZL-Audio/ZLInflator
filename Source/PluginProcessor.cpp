@@ -26,18 +26,16 @@ ZLInflatorAudioProcessor::ZLInflatorAudioProcessor()
 #endif
 ),
 #endif
-          parameters(*this, nullptr, juce::Identifier("ZLInflatorParameters"), {}),
+          parameters(*this, nullptr, juce::Identifier("ZLInflatorParameters"), ZLDsp::getParameterLayout()),
           waveShaperAttach(chain.get<waveShaper>(), parameters) {
     parameters.state.addChild(
             {"uiState", {{"width", ZLInterface::WindowWidth}, {"height", ZLInterface::WindowHeight}}, {}}, -1, nullptr);
 
-    parameters.createAndAddParameter(ZLDsp::inputGain::get());
-    parameters.createAndAddParameter(ZLDsp::outputGain::get());
     chain.get<gain1>().setGainDecibels(ZLDsp::inputGain::defaultV);
     chain.get<gain2>().setGainDecibels(ZLDsp::outputGain::defaultV);
     parameters.addParameterListener(ZLDsp::inputGain::ID, this);
     parameters.addParameterListener(ZLDsp::outputGain::ID, this);
-    waveShaperAttach.addParameters();
+    waveShaperAttach.addListeners();
 }
 
 ZLInflatorAudioProcessor::~ZLInflatorAudioProcessor() = default;
