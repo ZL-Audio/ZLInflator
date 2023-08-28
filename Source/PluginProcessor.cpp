@@ -26,15 +26,13 @@ ZLInflatorAudioProcessor::ZLInflatorAudioProcessor()
 #endif
 ),
 #endif
-          parameters(*this, nullptr, juce::Identifier("ZLInflatorParameters"), ZLDsp::getParameterLayout()),
+          parameters(*this, nullptr, juce::Identifier("ZLInflatorParameters"), zldsp::getParameterLayout()),
+          states(*this, nullptr, juce::Identifier("ZLInflatorStates"), zlstate::getParameterLayout()),
           waveShaperAttach(chain.get<waveShaper>(), parameters) {
-    parameters.state.addChild(
-            {"uiState", {{"width", ZLInterface::WindowWidth}, {"height", ZLInterface::WindowHeight}}, {}}, -1, nullptr);
-
-    chain.get<gain1>().setGainDecibels(ZLDsp::inputGain::defaultV);
-    chain.get<gain2>().setGainDecibels(ZLDsp::outputGain::defaultV);
-    parameters.addParameterListener(ZLDsp::inputGain::ID, this);
-    parameters.addParameterListener(ZLDsp::outputGain::ID, this);
+    chain.get<gain1>().setGainDecibels(zldsp::inputGain::defaultV);
+    chain.get<gain2>().setGainDecibels(zldsp::outputGain::defaultV);
+    parameters.addParameterListener(zldsp::inputGain::ID, this);
+    parameters.addParameterListener(zldsp::outputGain::ID, this);
     waveShaperAttach.addListeners();
 }
 
@@ -72,22 +70,24 @@ bool ZLInflatorAudioProcessor::isMidiEffect() const {
 double ZLInflatorAudioProcessor::getTailLengthSeconds() const { return 0.0; }
 
 int ZLInflatorAudioProcessor::getNumPrograms() {
-    return 1; // NB: some hosts don't cope very well if you tell them there are 0
-    // programs,
-    // so this should be at least 1, even if you're not really implementing
-    // programs.
+    return 1;
 }
 
 int ZLInflatorAudioProcessor::getCurrentProgram() { return 0; }
 
-void ZLInflatorAudioProcessor::setCurrentProgram(int index) {}
+void ZLInflatorAudioProcessor::setCurrentProgram(int index) {
+    juce::ignoreUnused(index);
+}
 
 const juce::String ZLInflatorAudioProcessor::getProgramName(int index) {
+    juce::ignoreUnused(index);
     return {};
 }
 
 void ZLInflatorAudioProcessor::changeProgramName(int index,
-                                                 const juce::String &newName) {}
+                                                 const juce::String &newName) {
+    juce::ignoreUnused(index, newName);
+}
 
 //==============================================================================
 void ZLInflatorAudioProcessor::prepareToPlay(double sampleRate,
@@ -156,22 +156,21 @@ juce::AudioProcessorEditor *ZLInflatorAudioProcessor::createEditor() {
 //==============================================================================
 void ZLInflatorAudioProcessor::getStateInformation(
         juce::MemoryBlock &destData) {
-    auto state = parameters.copyState();
-    std::unique_ptr<juce::XmlElement> xml(state.createXml());
+    auto tempTree = juce::ValueTree("ZLInflatorParaState");
+    tempTree.appendChild(parameters.copyState(), nullptr);
+    tempTree.appendChild(states.copyState(), nullptr);
+    std::unique_ptr<juce::XmlElement> xml(tempTree.createXml());
     copyXmlToBinary(*xml, destData);
 }
 
 void ZLInflatorAudioProcessor::setStateInformation(const void *data,
                                                    int sizeInBytes) {
-    // You should use this method to restore your parameters from this memory
-    // block, whose contents will have been created by the getStateInformation()
-    // call.
-    std::unique_ptr<juce::XmlElement> xmlState(
-            getXmlFromBinary(data, sizeInBytes));
-
-    if (xmlState.get() != nullptr)
-        if (xmlState->hasTagName(parameters.state.getType()))
-            parameters.replaceState(juce::ValueTree::fromXml(*xmlState));
+    std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+    if (xmlState != nullptr && xmlState->hasTagName("ZLInflatorParaState")) {
+        auto tempTree = juce::ValueTree::fromXml(*xmlState);
+        parameters.replaceState(tempTree.getChildWithName(parameters.state.getType()));
+        states.replaceState(tempTree.getChildWithName(states.state.getType()));
+    }
 }
 
 //==============================================================================
@@ -193,9 +192,9 @@ shaper::ShaperMixer<float> *ZLInflatorAudioProcessor::getShaperMixer() {
 }
 
 void ZLInflatorAudioProcessor::parameterChanged(const juce::String &parameterID, float newValue) {
-    if (parameterID.equalsIgnoreCase(ZLDsp::inputGain::ID)) {
+    if (parameterID.equalsIgnoreCase(zldsp::inputGain::ID)) {
         chain.get<gain1>().setGainDecibels(newValue);
-    } else if (parameterID.equalsIgnoreCase(ZLDsp::outputGain::ID)) {
+    } else if (parameterID.equalsIgnoreCase(zldsp::outputGain::ID)) {
         chain.get<gain2>().setGainDecibels(newValue);
     }
 }

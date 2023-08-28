@@ -10,28 +10,22 @@ You should have received a copy of the GNU General Public License along with ZLI
 ==============================================================================
 */
 
-#ifndef ZLINFLATOR_METERPANEL_H
-#define ZLINFLATOR_METERPANEL_H
+#include "meter_panel.h"
 
-#include "../DSP/MeterSource.h"
-#include "../GUI/MeterComponent.h"
-#include "../GUI/interface_defines.h"
+MeterPanel::MeterPanel(MeterSource<float> *input, MeterSource<float> *output, zlinterface::UIBase &base) :
+inputMeter("IN", input, -40.0f, 0.0f, base),
+outputMeter("OUT", output, -40.0f, 0.0f, base){
+    addAndMakeVisible(inputMeter);
+    addAndMakeVisible(outputMeter);
+}
 
-class MeterPanel : public juce::Component {
-public:
-    explicit MeterPanel(MeterSource<float> *input, MeterSource<float> *output);
+MeterPanel::~MeterPanel() = default;
 
-    ~MeterPanel() override;
+void MeterPanel::paint(juce::Graphics &) {}
 
-    void paint(juce::Graphics &) override;
-
-    void resized() override;
-
-    void setFontSize(float size);
-
-private:
-    MeterComponent inputMeter, outputMeter;
-};
-
-
-#endif //ZLINFLATOR_METERPANEL_H
+void MeterPanel::resized() {
+    auto bound = getLocalBounds().toFloat();
+    auto inputBound = bound.removeFromLeft(bound.getWidth() * 0.5f);
+    inputMeter.setBounds(inputBound.toNearestInt());
+    outputMeter.setBounds(bound.toNearestInt());
+}

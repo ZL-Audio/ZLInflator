@@ -59,14 +59,14 @@ public:
         }
     }
 
-    std::vector<FloatType> getDisplay() {
+    std::vector<FloatType> getDisplayRMS() {
         for (size_t i = 0; i < displayRMS.size(); ++i) {
             displayRMS[i] = juce::jmax(displayRMS[i] - static_cast<FloatType>(decayRate), bufferRMS[i]);
         }
         return displayRMS;
     }
 
-    std::vector<FloatType> getPeak() {
+    std::vector<FloatType> getDisplayPeak() {
         for (size_t i = 0; i < displayPeak.size(); ++i) {
             displayPeak[i] = juce::jmax(displayPeak[i] - static_cast<FloatType>(decayRate), bufferPeak[i]);
         }

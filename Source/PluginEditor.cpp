@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License along with ZLI
 //==============================================================================
 ZLInflatorAudioProcessorEditor::ZLInflatorAudioProcessorEditor(ZLInflatorAudioProcessor &p) :
         AudioProcessorEditor(&p), audioProcessor(p),
-        mainPanel(p.parameters, p.getInputMeterSource(), p.getOutputMeterSource(), p.getShaperMixer()) {
+        mainPanel(p, p.getInputMeterSource(), p.getOutputMeterSource(), p.getShaperMixer()) {
     // set font
     auto sourceCodePro = juce::Typeface::createSystemTypefaceFor(BinaryData::OpenSansSemiBold_ttf,
                                                                  BinaryData::OpenSansSemiBold_ttfSize);
@@ -26,12 +26,12 @@ ZLInflatorAudioProcessorEditor::ZLInflatorAudioProcessorEditor(ZLInflatorAudioPr
     addAndMakeVisible(mainPanel);
 
     // set size & size listener
-    setResizeLimits(ZLInterface::WindowMinWidth, ZLInterface::WindowMinHeight,
-                    ZLInterface::WindowMaxWidth, ZLInterface::WindowMaxHeight);
-    getConstrainer()->setFixedAspectRatio(ZLInterface::WindowFixedAspectRatio);
+    setResizeLimits(zlstate::windowW::minV, zlstate::windowH::minV, zlstate::windowW::maxV, zlstate::windowH::maxV);
+    getConstrainer()->setFixedAspectRatio(
+            static_cast<float>(zlstate::windowW::defaultV) / static_cast<float>(zlstate::windowH::defaultV));
     setResizable(true, p.wrapperType != ZLInflatorAudioProcessor::wrapperType_AudioUnitv3);
-    lastUIWidth.referTo(p.parameters.state.getChildWithName("uiState").getPropertyAsValue("width", nullptr));
-    lastUIHeight.referTo(p.parameters.state.getChildWithName("uiState").getPropertyAsValue("height", nullptr));
+    lastUIWidth.referTo(p.states.getParameterAsValue(zlstate::windowW::ID));
+    lastUIHeight.referTo(p.states.getParameterAsValue(zlstate::windowH::ID));
     setSize(lastUIWidth.getValue(), lastUIHeight.getValue());
     lastUIWidth.addListener(this);
     lastUIHeight.addListener(this);
@@ -42,6 +42,7 @@ ZLInflatorAudioProcessorEditor::~ZLInflatorAudioProcessorEditor() {
 
 //==============================================================================
 void ZLInflatorAudioProcessorEditor::paint(juce::Graphics &g) {
+    juce::ignoreUnused(g);
 }
 
 void ZLInflatorAudioProcessorEditor::resized() {

@@ -10,31 +10,37 @@ You should have received a copy of the GNU General Public License along with ZLI
 ==============================================================================
 */
 
-#ifndef ZLINFLATOR_TOPPANEL_H
-#define ZLINFLATOR_TOPPANEL_H
+#ifndef ZLINFLATOR_MAINPANEL_H
+#define ZLINFLATOR_MAINPANEL_H
 
-#include "../GUI/ComboboxComponent.h"
-#include <BinaryData.h>
 #include <juce_audio_processors/juce_audio_processors.h>
+#include "../GUI/interface_definitions.h"
+#include "control_panel.h"
+#include "top_panel.h"
+#include "meter_panel.h"
+#include "plot_panel.h"
 
-class TopPanel : public juce::Component {
+class MainPanel : public juce::Component {
 public:
-    explicit TopPanel(juce::AudioProcessorValueTreeState &apvts);
+    explicit MainPanel(ZLInflatorAudioProcessor &p,
+        MeterSource<float> *input,
+        MeterSource<float> *output,
+        shaper::ShaperMixer<float> *shaperMixer);
 
-    ~TopPanel() override;
+    ~MainPanel() override;
 
-    //==============================================================================
     void paint(juce::Graphics &) override;
 
     void resized() override;
-
-    void setFontSize(float size);
-
 private:
-    const std::unique_ptr<juce::Drawable> logoDrawable;
-    std::unique_ptr<ComboboxComponent> sampleRateCombobox;
-    juce::OwnedArray<juce::AudioProcessorValueTreeState::ComboBoxAttachment> comboboxAttachments;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TopPanel)
+    zlinterface::UIBase uiBase;
+
+    ControlPanel controlPanel;
+    TopPanel topPanel;
+    MeterPanel meterPanel;
+    PlotPanel plotPanel;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainPanel)
 };
 
-#endif //ZLINFLATOR_TOPPANEL_H
+#endif //ZLINFLATOR_MAINPANEL_H

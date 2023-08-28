@@ -12,10 +12,8 @@ You should have received a copy of the GNU General Public License along with ZLI
 
 #pragma once
 
-#include "GUI/ButtonComponent.h"
-#include "GUI/RotarySliderComponent.h"
-#include "GUI/interface_defines.h"
-#include "Panel/MainPanel.h"
+#include "Panel/main_panel.h"
+#include "State/state_definitions.h"
 #include "PluginProcessor.h"
 
 //==============================================================================

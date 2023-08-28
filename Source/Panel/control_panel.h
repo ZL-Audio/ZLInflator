@@ -13,16 +13,17 @@ You should have received a copy of the GNU General Public License along with ZLI
 #ifndef ZLINFLATOR_CONTROLPANEL_H
 #define ZLINFLATOR_CONTROLPANEL_H
 
-#include "../GUI/ButtonComponent.h"
-#include "../GUI/RotarySliderComponent.h"
-#include "../GUI/ComboboxComponent.h"
+#include "../GUI/button_component.h"
+#include "../GUI/rotary_slider_component.h"
+#include "../GUI/combobox_component.h"
 #include "../DSP/dsp_defines.h"
+#include "panel_definitions.h"
 #include <BinaryData.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
 class ControlPanel : public juce::Component {
 public:
-    explicit ControlPanel(juce::AudioProcessorValueTreeState &apvts);
+    explicit ControlPanel(juce::AudioProcessorValueTreeState &apvts, zlinterface::UIBase &base);
 
     ~ControlPanel() override;
 
@@ -31,15 +32,23 @@ public:
 
     void resized() override;
 
-    void setFontSize(float size);
-
 private:
-    std::unique_ptr<RotarySliderComponent> inputGainSlider, outputGainSlider, lowSplitSlider, highSplitSlider, wetSlider, curve1Slider, weightSlider, curve2Slider;
-    std::unique_ptr<ButtonComponent> effectButton, splitButton;
-    std::unique_ptr<ComboboxComponent> style1Box, style2Box;
-
+    std::unique_ptr<zlinterface::RotarySliderComponent> inputGainSlider, outputGainSlider;
+    std::unique_ptr<zlinterface::RotarySliderComponent> lowSplitSlider, highSplitSlider, wetSlider, curve1Slider, weightSlider, curve2Slider;
+    std::array<std::unique_ptr<zlinterface::RotarySliderComponent> *, 8> rotarySliderList{&inputGainSlider,
+                                                                                          &outputGainSlider,
+                                                                                          &lowSplitSlider,
+                                                                                          &highSplitSlider, &wetSlider,
+                                                                                          &curve1Slider, &weightSlider,
+                                                                                          &curve2Slider};
     juce::OwnedArray<juce::AudioProcessorValueTreeState::SliderAttachment> sliderAttachments;
+
+    std::unique_ptr<zlinterface::ButtonComponent> effectButton, splitButton;
+    std::array<std::unique_ptr<zlinterface::ButtonComponent> *, 2> buttonList{&effectButton, &splitButton};
     juce::OwnedArray<juce::AudioProcessorValueTreeState::ButtonAttachment> buttonAttachments;
+
+    std::unique_ptr<zlinterface::ComboboxComponent> style1Box, style2Box;
+    std::array<std::unique_ptr<zlinterface::ComboboxComponent> *, 2> comboBoxList{&style1Box, &style2Box};
     juce::OwnedArray<juce::AudioProcessorValueTreeState::ComboBoxAttachment> comboboxAttachments;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ControlPanel)

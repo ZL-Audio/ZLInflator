@@ -15,13 +15,20 @@ You should have received a copy of the GNU General Public License along with ZLI
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
-namespace ZLDsp {
+namespace zldsp {
+    inline auto static const versionHint = 1;
     // floats
     template<class T>
     class FloatParameters {
     public:
-        static std::unique_ptr<juce::AudioParameterFloat> get() {
-            return std::make_unique<juce::AudioParameterFloat>(T::ID, T::name, T::range, T::defaultV);
+        static std::unique_ptr<juce::AudioParameterFloat> get(bool automate = true) {
+            auto attributes = juce::AudioParameterFloatAttributes().withAutomatable(automate).withLabel(T::name);
+            return std::make_unique<juce::AudioParameterFloat>(juce::ParameterID(T::ID, versionHint), T::name,
+                                                               T::range, T::defaultV, attributes);
+        }
+
+        inline static float convertTo01(float x) {
+            return T::range.convertTo0to1(x);
         }
     };
 
@@ -105,8 +112,16 @@ namespace ZLDsp {
     template<class T>
     class BoolParameters {
     public:
-        static std::unique_ptr<juce::AudioParameterBool> get() {
-            return std::make_unique<juce::AudioParameterBool>(T::ID, T::name, T::defaultV);
+        static std::unique_ptr<juce::AudioParameterBool> get(bool automate = true) {
+            auto attributes = juce::AudioParameterBoolAttributes().withAutomatable(automate).withLabel(T::name);
+            return std::make_unique<juce::AudioParameterBool>(juce::ParameterID(T::ID, versionHint), T::name,
+                                                              T::defaultV, attributes);
+        }
+
+        static std::unique_ptr<juce::AudioParameterBool> get(juce::String label, bool automate = true) {
+            auto attributes = juce::AudioParameterBoolAttributes().withAutomatable(automate).withLabel(label);
+            return std::make_unique<juce::AudioParameterBool>(juce::ParameterID(T::ID, versionHint), T::name,
+                                                              T::defaultV, attributes);
         }
     };
 
@@ -128,8 +143,16 @@ namespace ZLDsp {
     template<class T>
     class ChoiceParameters {
     public:
-        static std::unique_ptr<juce::AudioParameterChoice> get() {
-            return std::make_unique<juce::AudioParameterChoice>(T::ID, T::name, T::choices, T::defaultI);
+        static std::unique_ptr<juce::AudioParameterChoice> get(bool automate = true) {
+            auto attributes = juce::AudioParameterChoiceAttributes().withAutomatable(automate).withLabel(T::name);
+            return std::make_unique<juce::AudioParameterChoice>(
+                    juce::ParameterID(T::ID, versionHint), T::name, T::choices, T::defaultI, attributes);
+        }
+
+        static std::unique_ptr<juce::AudioParameterChoice> get(juce::String label, bool automate = true) {
+            auto attributes = juce::AudioParameterChoiceAttributes().withAutomatable(automate).withLabel(label);
+            return std::make_unique<juce::AudioParameterChoice>(
+                    juce::ParameterID(T::ID, versionHint), T::name, T::choices, T::defaultI, attributes);
         }
     };
 

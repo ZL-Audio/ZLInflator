@@ -165,9 +165,9 @@ namespace shaper {
                 shaper1[i] = makeShaper<FloatType>(static_cast<ShaperType>(i));
                 shaper2[i] = makeShaper<FloatType>(static_cast<ShaperType>(i));
             }
-            setShapes(ZLDsp::curve1::formatV(ZLDsp::curve1::defaultV),
-                      ZLDsp::curve2::formatV(ZLDsp::curve2::defaultV),
-                      ZLDsp::weight::formatV(ZLDsp::weight::defaultV));
+            setShapes(zldsp::curve1::formatV(zldsp::curve1::defaultV),
+                      zldsp::curve2::formatV(zldsp::curve2::defaultV),
+                      zldsp::weight::formatV(zldsp::weight::defaultV));
         }
 
         ~ShaperMixer() = default;
@@ -204,8 +204,8 @@ namespace shaper {
     private:
         std::array<std::unique_ptr<Shaper<FloatType>>, ShaperType::ShaperNUM> shaper1, shaper2;
         FloatType m_weight1, m_weight2;
-        size_t m_type1 = static_cast<size_t>(ZLDsp::style1::defaultI);
-        size_t m_type2 = static_cast<size_t>(ZLDsp::style2::defaultI);
+        size_t m_type1 = static_cast<size_t>(zldsp::style1::defaultI);
+        size_t m_type2 = static_cast<size_t>(zldsp::style2::defaultI);
         std::atomic<bool> newFunction = true;
 
         FloatType shape(FloatType x) const {

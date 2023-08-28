@@ -75,33 +75,41 @@ set(SourceFiles
         Source/PluginProcessor.h
         Source/PluginProcessor.cpp
 
+        Source/State/state_definitions.h
+
         Source/DSP/dsp_defines.h
         Source/DSP/WaveShaper.h
         Source/DSP/ShaperFunctions.h
         Source/DSP/MeterSource.h
 
-        Source/Panel/ControlPanel.h
-        Source/Panel/ControlPanel.cpp
-        Source/Panel/TopPanel.h
-        Source/Panel/TopPanel.cpp
-        Source/Panel/MeterPanel.h
-        Source/Panel/MeterPanel.cpp
-        Source/Panel/PlotPanel.h
-        Source/Panel/PlotPanel.cpp
-        Source/Panel/MainPanel.h
-        Source/Panel/MainPanel.cpp
+        Source/Panel/panel_definitions.h
+        Source/Panel/control_panel.h
+        Source/Panel/control_panel.cpp
+        Source/Panel/top_panel.h
+        Source/Panel/top_panel.cpp
+        Source/Panel/logo_panel.h
+        Source/Panel/logo_panel.cpp
+        Source/Panel/meter_panel.h
+        Source/Panel/meter_panel.cpp
+        Source/Panel/plot_panel.h
+        Source/Panel/plot_panel.cpp
+        Source/Panel/main_panel.h
+        Source/Panel/main_panel.cpp
 
-        Source/GUI/interface_defines.h
-        Source/GUI/NameLookAndFeel.h
-        Source/GUI/ShaperPlotComponent.h
-        Source/GUI/MeterLookAndFeel.h
-        Source/GUI/MeterComponent.h
-        Source/GUI/RotarySliderLookAndFeel.h
-        Source/GUI/RotarySliderComponent.h
-        Source/GUI/ButtonLookAndFeel.h
-        Source/GUI/ButtonComponent.h
-        Source/GUI/ComboboxLookAndFeel.h
-        Source/GUI/ComboboxComponent.h)
+        Source/GUI/interface_definitions.h
+        Source/GUI/name_look_and_feel.h
+        Source/GUI/button_look_and_feel.h
+        Source/GUI/button_component.h
+        Source/GUI/rotary_slider_look_and_feel.h
+        Source/GUI/rotary_slider_component.h
+        Source/GUI/linear_slider_look_and_feel.h
+        Source/GUI/linear_slider_component.h
+        Source/GUI/meter_look_and_feel.h
+        Source/GUI/meter_component.h
+        Source/GUI/shaper_plot_component.h
+        Source/GUI/combobox_look_and_feel.h
+        Source/GUI/combobox_component.h)
+
 target_sources("${PROJECT_NAME}" PRIVATE ${SourceFiles})
 
 # No, we don't want our source buried in extra nested folders
@@ -112,7 +120,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX "" FILES ${SourceFil
 
 # Setup our binary data as a target
 juce_add_binary_data(Assets SOURCES
-        resources/small_logo.svg
+        resources/logo.svg
+        resources/zlaudio.svg
         resources/font/OpenSans-SemiBold.ttf)
 
 # Required for Linux happiness:

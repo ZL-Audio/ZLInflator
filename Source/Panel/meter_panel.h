@@ -10,27 +10,26 @@ You should have received a copy of the GNU General Public License along with ZLI
 ==============================================================================
 */
 
-#include "MeterPanel.h"
+#ifndef ZLINFLATOR_METERPANEL_H
+#define ZLINFLATOR_METERPANEL_H
 
-MeterPanel::MeterPanel(MeterSource<float> *input, MeterSource<float> *output) :
-inputMeter("IN", input, -40.0f, 0.0f),
-outputMeter("OUT", output, -40.0f, 0.0f){
-    addAndMakeVisible(inputMeter);
-    addAndMakeVisible(outputMeter);
-}
+#include "../DSP/MeterSource.h"
+#include "../GUI/meter_component.h"
+#include "../GUI/interface_definitions.h"
 
-MeterPanel::~MeterPanel() = default;
+class MeterPanel : public juce::Component {
+public:
+    explicit MeterPanel(MeterSource<float> *input, MeterSource<float> *output, zlinterface::UIBase &base);
 
-void MeterPanel::paint(juce::Graphics &) {}
+    ~MeterPanel() override;
 
-void MeterPanel::resized() {
-    auto bound = getLocalBounds().toFloat();
-    auto inputBound = bound.removeFromLeft(bound.getWidth() * 0.5f);
-    inputMeter.setBounds(inputBound.toNearestInt());
-    outputMeter.setBounds(bound.toNearestInt());
-}
+    void paint(juce::Graphics &) override;
 
-void MeterPanel::setFontSize(float size) {
-    inputMeter.setFontSize(size);
-    outputMeter.setFontSize(size);
-}
+    void resized() override;
+
+private:
+    zlinterface::MeterComponent inputMeter, outputMeter;
+};
+
+
+#endif //ZLINFLATOR_METERPANEL_H

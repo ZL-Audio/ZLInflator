@@ -10,16 +10,32 @@ You should have received a copy of the GNU General Public License along with ZLI
 ==============================================================================
 */
 
-#include "PlotPanel.h"
+#include "plot_panel.h"
 
-PlotPanel::PlotPanel(shaper::ShaperMixer<float> *shaperMixer) :
-        shaperPlotComponent((shaperMixer)){
+PlotPanel::PlotPanel(ZLInflatorAudioProcessor &p,
+                     shaper::ShaperMixer<float> *shaperMixer,
+                     zlinterface::UIBase &base) :
+        shaperPlotComponent(shaperMixer, base) {
+    processorRef = &p;
     addAndMakeVisible(shaperPlotComponent);
+
+    for (const auto &isPlotChangedParaID: isPlotChangedParaIDs) {
+        processorRef->parameters.addParameterListener(isPlotChangedParaID, this);
+    }
 }
 
-PlotPanel::~PlotPanel() = default;
+PlotPanel::~PlotPanel() {
+    for (const auto &isPlotChangedParaID: isPlotChangedParaIDs) {
+        processorRef->parameters.removeParameterListener(isPlotChangedParaID, this);
+    }
+}
 
 void PlotPanel::paint(juce::Graphics &) {}
+
+void PlotPanel::parameterChanged(const juce::String &parameterID, float newValue) {
+    juce::ignoreUnused(parameterID, newValue);
+    triggerAsyncUpdate();
+}
 
 void PlotPanel::resized() {
     auto bound = getLocalBounds().toFloat();
@@ -28,6 +44,6 @@ void PlotPanel::resized() {
     shaperPlotComponent.setBounds(bound.toNearestInt());
 }
 
-void PlotPanel::setFontSize(float size) {
-    shaperPlotComponent.setFontSize(size);
+void PlotPanel::handleAsyncUpdate() {
+    repaint();
 }

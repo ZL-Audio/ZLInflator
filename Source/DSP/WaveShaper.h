@@ -23,7 +23,7 @@ template<typename FloatType>
 class WaveHelper {
 public:
     WaveHelper(){
-        setWet(static_cast<FloatType>(ZLDsp::wet::formatV(ZLDsp::wet::defaultV)));
+        setWet(static_cast<FloatType>(zldsp::wet::formatV(zldsp::wet::defaultV)));
     }
 
     void setWet(FloatType wet) {
@@ -71,7 +71,7 @@ public:
     }
 
     void setCutoffFrequency(float freq) {
-        if (freq != filters[0].getCutoffFrequency()) {
+        if (!juce::approximatelyEqual(freq, filters[0].getCutoffFrequency())) {
             for (auto &f: filters) {
                 f.setCutoffFrequency(freq);
             }
@@ -88,7 +88,7 @@ public:
         auto rate = static_cast<int> (std::pow(2.0, factor));
         juce::dsp::ProcessSpec spec{dupSpec.sampleRate * rate,
                                     dupSpec.numChannels,
-                                    dupSpec.maximumBlockSize * rate};
+                                    dupSpec.maximumBlockSize * static_cast<unsigned int>(rate)};
         for (auto &f: filters) {
             f.prepare(spec);
         }
@@ -128,8 +128,8 @@ template<typename FloatType>
 class WaveShaper {
 public:
     WaveShaper() {
-        filters[0].setCutoffFrequency(ZLDsp::lowSplit::defaultV);
-        filters[1].setCutoffFrequency(ZLDsp::highSplit::defaultV);
+        filters[0].setCutoffFrequency(zldsp::lowSplit::defaultV);
+        filters[1].setCutoffFrequency(zldsp::highSplit::defaultV);
     }
 
     shaper::ShaperMixer<FloatType>* getShaper() {return helper.getShaper();}
@@ -285,8 +285,8 @@ private:
     WaveHelper<FloatType> helper;
     std::array<std::unique_ptr<juce::dsp::Oversampling<FloatType>>, numSamplers>
             overSamplers{};
-    std::atomic<size_t> idxSampler = ZLDsp::overSample::defaultI;
-    std::atomic<bool> split = ZLDsp::bandSplit::defaultV, effect = ZLDsp::effectIn::defaultV;
+    std::atomic<size_t> idxSampler = zldsp::overSample::defaultI;
+    std::atomic<bool> split = zldsp::bandSplit::defaultV, effect = zldsp::effectIn::defaultV;
     std::array<LRFilters<FloatType>, numBands - 1> filters{};
     juce::AudioBuffer<FloatType> bufferSeparation;
 };
@@ -300,56 +300,56 @@ public:
     }
 
     void addListeners() {
-        std::array IDs{ZLDsp::effectIn::ID, ZLDsp::style1::ID, ZLDsp::style2::ID,
-                       ZLDsp::wet::ID, ZLDsp::curve1::ID, ZLDsp::curve2::ID, ZLDsp::weight::ID,
-                       ZLDsp::bandSplit::ID, ZLDsp::lowSplit::ID, ZLDsp::highSplit::ID,
-                       ZLDsp::overSample::ID};
+        std::array IDs{zldsp::effectIn::ID, zldsp::style1::ID, zldsp::style2::ID,
+                       zldsp::wet::ID, zldsp::curve1::ID, zldsp::curve2::ID, zldsp::weight::ID,
+                       zldsp::bandSplit::ID, zldsp::lowSplit::ID, zldsp::highSplit::ID,
+                       zldsp::overSample::ID};
         for (auto &ID: IDs) {
             apvts->addParameterListener(ID, this);
         }
     }
 
     void parameterChanged(const juce::String &parameterID, float newValue) override {
-        if (parameterID == ZLDsp::wet::ID) {
+        if (parameterID == zldsp::wet::ID) {
             waveShaper->setWet(static_cast<FloatType>(newValue) / static_cast<FloatType>(100));
-        } else if (parameterID == ZLDsp::curve1::ID || parameterID == ZLDsp::curve2::ID ||
-                   parameterID == ZLDsp::weight::ID) {
-            auto curve1 = apvts->getRawParameterValue(ZLDsp::curve1::ID)->load();
-            auto curve2 = apvts->getRawParameterValue(ZLDsp::curve2::ID)->load();
-            auto weight = apvts->getRawParameterValue(ZLDsp::weight::ID)->load();
-            if (parameterID == ZLDsp::curve1::ID) {
+        } else if (parameterID == zldsp::curve1::ID || parameterID == zldsp::curve2::ID ||
+                   parameterID == zldsp::weight::ID) {
+            auto curve1 = apvts->getRawParameterValue(zldsp::curve1::ID)->load();
+            auto curve2 = apvts->getRawParameterValue(zldsp::curve2::ID)->load();
+            auto weight = apvts->getRawParameterValue(zldsp::weight::ID)->load();
+            if (parameterID == zldsp::curve1::ID) {
                 curve1 = newValue;
-            } else if (parameterID == ZLDsp::curve2::ID) {
+            } else if (parameterID == zldsp::curve2::ID) {
                 curve2 = newValue;
             } else {
                 weight = newValue;
             }
-            waveShaper->setShapes(static_cast<FloatType>(ZLDsp::curve1::formatV(curve1)),
-                                  static_cast<FloatType>(ZLDsp::curve2::formatV(curve2)),
-                                  static_cast<FloatType>(ZLDsp::weight::formatV(weight)));
-        } else if (parameterID == ZLDsp::lowSplit::ID || parameterID == ZLDsp::highSplit::ID) {
-            auto lowSplit = apvts->getRawParameterValue(ZLDsp::lowSplit::ID)->load();
-            auto highSplit = apvts->getRawParameterValue(ZLDsp::highSplit::ID)->load();
-            if (parameterID == ZLDsp::lowSplit::ID) {
+            waveShaper->setShapes(static_cast<FloatType>(zldsp::curve1::formatV(curve1)),
+                                  static_cast<FloatType>(zldsp::curve2::formatV(curve2)),
+                                  static_cast<FloatType>(zldsp::weight::formatV(weight)));
+        } else if (parameterID == zldsp::lowSplit::ID || parameterID == zldsp::highSplit::ID) {
+            auto lowSplit = apvts->getRawParameterValue(zldsp::lowSplit::ID)->load();
+            auto highSplit = apvts->getRawParameterValue(zldsp::highSplit::ID)->load();
+            if (parameterID == zldsp::lowSplit::ID) {
                 lowSplit = newValue;
             } else {
                 highSplit = newValue;
             }
             waveShaper->setCutoffFrequency(lowSplit, highSplit);
-        } else if (parameterID == ZLDsp::bandSplit::ID) {
+        } else if (parameterID == zldsp::bandSplit::ID) {
             waveShaper->setSplitFlag(static_cast<bool>(newValue));
-        } else if (parameterID == ZLDsp::effectIn::ID) {
+        } else if (parameterID == zldsp::effectIn::ID) {
             waveShaper->setEffectFlag(static_cast<bool>(newValue));
-        } else if (parameterID == ZLDsp::style1::ID || parameterID == ZLDsp::style2::ID) {
-            auto type1 = apvts->getRawParameterValue(ZLDsp::style1::ID)->load();
-            auto type2 = apvts->getRawParameterValue(ZLDsp::style2::ID)->load();
-            if (parameterID == ZLDsp::style1::ID) {
+        } else if (parameterID == zldsp::style1::ID || parameterID == zldsp::style2::ID) {
+            auto type1 = apvts->getRawParameterValue(zldsp::style1::ID)->load();
+            auto type2 = apvts->getRawParameterValue(zldsp::style2::ID)->load();
+            if (parameterID == zldsp::style1::ID) {
                 type1 = newValue;
             } else {
                 type2 = newValue;
             }
             waveShaper->setTypes(static_cast<size_t>(type1), static_cast<size_t>(type2));
-        } else if (parameterID == ZLDsp::overSample::ID) {
+        } else if (parameterID == zldsp::overSample::ID) {
             waveShaper->setOverSampleFactor(static_cast<int>(newValue));
         }
     }

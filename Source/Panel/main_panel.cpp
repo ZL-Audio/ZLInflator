@@ -10,16 +10,17 @@ You should have received a copy of the GNU General Public License along with ZLI
 ==============================================================================
 */
 
-#include "MainPanel.h"
+#include "main_panel.h"
 
-MainPanel::MainPanel(juce::AudioProcessorValueTreeState &apvts,
+MainPanel::MainPanel(ZLInflatorAudioProcessor &p,
                      MeterSource<float> *input,
                      MeterSource<float> *output,
                      shaper::ShaperMixer<float> *shaperMixer) :
-        controlPanel(apvts),
-        topPanel(apvts),
-        meterPanel(input, output),
-        plotPanel(shaperMixer) {
+        uiBase(),
+        controlPanel(p.parameters, uiBase),
+        topPanel(p, uiBase),
+        meterPanel(input, output, uiBase),
+        plotPanel(p, shaperMixer, uiBase) {
     addAndMakeVisible(controlPanel);
     addAndMakeVisible(topPanel);
     addAndMakeVisible(meterPanel);
@@ -29,25 +30,21 @@ MainPanel::MainPanel(juce::AudioProcessorValueTreeState &apvts,
 MainPanel::~MainPanel() = default;
 
 void MainPanel::paint(juce::Graphics &g) {
-    g.fillAll(ZLInterface::BackgroundColor);
+    g.fillAll(uiBase.getBackgroundColor());
     auto bound = getLocalBounds().toFloat();
-    float fontSize = bound.getHeight() * 0.045f;
-    bound = ZLInterface::fillRoundedShadowRectangle(g, bound, fontSize * 0.5f);
-    ZLInterface::fillRoundedInnerShadowRectangle(g, bound, fontSize * 0.5f, fontSize * 0.15f,
-                                                 true, true, true, true, true);
+    float fontSize = bound.getHeight() * 0.048f;
+    bound = uiBase.fillRoundedShadowRectangle(g, bound, fontSize * 0.5f, {});
+    uiBase.fillRoundedInnerShadowRectangle(g, bound, fontSize * 0.5f, {.flip=true});
 }
 
 void MainPanel::resized() {
-    topPanel.setFontSize(static_cast<float>(getLocalBounds().getHeight()) * 0.045f);
-    controlPanel.setFontSize(static_cast<float>(getLocalBounds().getHeight()) * 0.045f);
-    meterPanel.setFontSize(static_cast<float>(getLocalBounds().getHeight()) * 0.045f);
-    plotPanel.setFontSize(static_cast<float>(getLocalBounds().getHeight()) * 0.045f);
+    uiBase.setFontSize(static_cast<float>(getLocalBounds().getHeight()) * 0.048f);
 
     juce::Grid grid;
     using Track = juce::Grid::TrackInfo;
     using Fr = juce::Grid::Fr;
 
-    grid.templateRows = {Track(Fr(1)), Track(Fr(3))};
+    grid.templateRows = {Track(Fr(3)), Track(Fr(12))};
     grid.templateColumns = {Track(Fr(6)), Track(Fr(10)), Track(Fr(3))};
 
     grid.items = {
@@ -61,10 +58,4 @@ void MainPanel::resized() {
     auto padding = bound.getHeight() * 0.08f;
     bound = bound.withSizeKeepingCentre(bound.getWidth() - padding, bound.getHeight() - padding);
     grid.performLayout(bound.toNearestInt());
-}
-
-void MainPanel::setFontSize(float size) {
-    topPanel.setFontSize(size);
-    controlPanel.setFontSize(size);
-    meterPanel.setFontSize(size);
 }

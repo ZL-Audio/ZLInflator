@@ -10,27 +10,23 @@ You should have received a copy of the GNU General Public License along with ZLI
 ==============================================================================
 */
 
-#ifndef ZLINFLATOR_PLOTPANEL_H
-#define ZLINFLATOR_PLOTPANEL_H
+#include "top_panel.h"
 
-#include "../GUI/ShaperPlotComponent.h"
+TopPanel::TopPanel(ZLInflatorAudioProcessor &p,
+                   zlinterface::UIBase &base) :
+        logoPanel(p, base) {
+    uiBase = &base;
+    // init combobox
+    std::array<std::string, 1> comboboxID{"over_sample"};
+    zlpanel::attachBoxes(*this, comboBoxList, comboboxAttachments, comboboxID, p.parameters, base);
+    addAndMakeVisible(logoPanel);
+}
 
-class PlotPanel : public juce::Component {
-public:
-    explicit PlotPanel(shaper::ShaperMixer<float> *shaperMixer);
+TopPanel::~TopPanel() = default;
 
-    ~PlotPanel() override;
+void TopPanel::paint(juce::Graphics &g) { juce::ignoreUnused(g); }
 
-    void paint(juce::Graphics &) override;
-
-    void resized() override;
-
-    void setFontSize(float size);
-
-private:
-    ShaperPlotComponent shaperPlotComponent;
-
-};
-
-
-#endif //ZLINFLATOR_PLOTPANEL_H
+void TopPanel::resized() {
+    logoPanel.setBoundsRelative(0.f, 0.0f, 0.582f, 1.0f);
+    sampleRateCombobox->setBoundsRelative(0.583f, 0.0f, 0.416f, 1.0f);
+}

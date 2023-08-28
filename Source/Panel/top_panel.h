@@ -10,39 +10,35 @@ You should have received a copy of the GNU General Public License along with ZLI
 ==============================================================================
 */
 
-#ifndef ZLINFLATOR_MAINPANEL_H
-#define ZLINFLATOR_MAINPANEL_H
+#ifndef ZLINFLATOR_TOPPANEL_H
+#define ZLINFLATOR_TOPPANEL_H
 
+#include "../GUI/combobox_component.h"
+#include "logo_panel.h"
+#include "panel_definitions.h"
+#include <BinaryData.h>
 #include <juce_audio_processors/juce_audio_processors.h>
-#include "../GUI/interface_defines.h"
-#include "ControlPanel.h"
-#include "TopPanel.h"
-#include "MeterPanel.h"
-#include "PlotPanel.h"
 
-class MainPanel : public juce::Component {
+class TopPanel : public juce::Component {
 public:
-    explicit MainPanel(juce::AudioProcessorValueTreeState &apvts,
-        MeterSource<float> *input,
-        MeterSource<float> *output,
-        shaper::ShaperMixer<float> *shaperMixer);
+    explicit TopPanel(ZLInflatorAudioProcessor &p,
+                      zlinterface::UIBase &base);
 
-    ~MainPanel() override;
+    ~TopPanel() override;
 
     //==============================================================================
     void paint(juce::Graphics &) override;
 
     void resized() override;
 
-    void setFontSize(float size);
-
 private:
-    ControlPanel controlPanel;
-    TopPanel topPanel;
-    MeterPanel meterPanel;
-    PlotPanel plotPanel;
+    std::unique_ptr<zlinterface::ComboboxComponent> sampleRateCombobox;
+    std::array<std::unique_ptr<zlinterface::ComboboxComponent> *, 1> comboBoxList{&sampleRateCombobox};
+    juce::OwnedArray<juce::AudioProcessorValueTreeState::ComboBoxAttachment> comboboxAttachments;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainPanel)
+    zlinterface::UIBase *uiBase;
+    zlpanel::LogoPanel logoPanel;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TopPanel)
 };
 
-#endif //ZLINFLATOR_MAINPANEL_H
+#endif //ZLINFLATOR_TOPPANEL_H
