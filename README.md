@@ -1,4 +1,7 @@
-<img src="Docs/logo.svg" width=50%>
+<p float="left">
+  <img src="Docs/compact_darkblue_flat.svg" width="33%" />
+  <img src="Docs/logo.svg" width="7.5%" />
+</p>
 
 # ZLInflator
 
