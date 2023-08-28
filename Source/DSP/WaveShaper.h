@@ -22,7 +22,7 @@ You should have received a copy of the GNU General Public License along with ZLI
 template<typename FloatType>
 class WaveHelper {
 public:
-    WaveHelper(){
+    WaveHelper() {
         setWet(static_cast<FloatType>(zldsp::wet::formatV(zldsp::wet::defaultV)));
     }
 
@@ -41,7 +41,7 @@ public:
 
     FloatType operator()(FloatType x) const { return shape(x); }
 
-    shaper::ShaperMixer<FloatType>* getShaper() {return &shaperMixer;}
+    shaper::ShaperMixer<FloatType> *getShaper() { return &shaperMixer; }
 
 private:
     static constexpr FloatType clip = static_cast<FloatType>(1);
@@ -127,12 +127,13 @@ private:
 template<typename FloatType>
 class WaveShaper {
 public:
-    WaveShaper() {
+    explicit WaveShaper(juce::AudioProcessor &processor) {
+        processorRef = &processor;
         filters[0].setCutoffFrequency(zldsp::lowSplit::defaultV);
         filters[1].setCutoffFrequency(zldsp::highSplit::defaultV);
     }
 
-    shaper::ShaperMixer<FloatType>* getShaper() {return helper.getShaper();}
+    shaper::ShaperMixer<FloatType> *getShaper() { return helper.getShaper(); }
 
     void setWet(FloatType wet) {
         helper.setWet(wet);
@@ -143,6 +144,7 @@ public:
     }
 
     void setCutoffFrequency(FloatType lowFreq, FloatType highFreq) {
+        const juce::GenericScopedLock<juce::CriticalSection> processLock(processorRef->getCallbackLock());
         filters[0].setCutoffFrequency(lowFreq);
         filters[1].setCutoffFrequency(highFreq);
     }
@@ -156,28 +158,16 @@ public:
     }
 
     void setOverSampleFactor(int overSampleFactor) {
+        const juce::GenericScopedLock<juce::CriticalSection> processLock(processorRef->getCallbackLock());
         idxSampler = static_cast<size_t>(std::min(overSampleFactor, numSamplers - 1));
         for (size_t i = 0; i < numBands - 1; ++i) {
             filters[i].update(overSampleFactor);
         }
+        processorRef->setLatencySamples(overSamplers[idxSampler]->getLatencyInSamples());
     }
 
     void setTypes(size_t type1, size_t type2) {
         helper.setTypes(type1, type2);
-    }
-
-    void setParameters(bool clipFlag, bool effectFlag, float curve,
-                       float wetWeight, bool bandSplit, float low_split,
-                       float high_split, int overSampleFactor) {
-        helper.setParameters(clipFlag, curve, wetWeight);
-        effect = effectFlag;
-        split = bandSplit;
-        idxSampler = (unsigned int) std::min(overSampleFactor, numSamplers - 1);
-        filters[0].setCutoffFrequency(low_split);
-        filters[1].setCutoffFrequency(high_split);
-        for (size_t i = 0; i < numBands - 1; ++i) {
-            filters[i].update(idxSampler);
-        }
     }
 
     void reset() noexcept {
@@ -188,10 +178,6 @@ public:
             if (overSamplers[i] != nullptr)
                 overSamplers[i]->reset();
         }
-    }
-
-    float getLatencyInSamples() {
-        return overSamplers[idxSampler]->getLatencyInSamples();
     }
 
     template<typename SampleType>
@@ -216,8 +202,9 @@ public:
             if (split) {
                 auto sepBlock =
                         juce::dsp::AudioBlock<FloatType>(bufferSeparation)
-                                .getSubBlock(0, (size_t) ((FloatType) std::pow(2.0, idxSampler) *
-                                                          (FloatType) numSamples));
+                                .getSubBlock(0, static_cast<size_t> (
+                                        std::pow(FloatType(2), static_cast<FloatType>(idxSampler)) *
+                                        static_cast<FloatType>(numSamples)));
                 juce::dsp::AudioBlock<FloatType> blocks[numBands];
                 std::vector<juce::dsp::ProcessContextReplacing<FloatType>> contexts;
                 for (size_t i = 0; i < numBands; ++i) {
@@ -280,6 +267,7 @@ public:
     }
 
 private:
+    juce::AudioProcessor *processorRef;
     constexpr static const int numSamplers = 5, numBands = 3;
     std::atomic<double> sampleRate;
     WaveHelper<FloatType> helper;

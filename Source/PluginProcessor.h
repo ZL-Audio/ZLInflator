@@ -101,16 +101,8 @@ private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ZLInflatorAudioProcessor)
 
-    enum {
-        gain1,
-        meter1,
-        waveShaper,
-        gain2,
-        meter2
-    };
-
-    using Gain = juce::dsp::Gain<float>;
-    juce::dsp::ProcessorChain<Gain, MeterSource<float>, WaveShaper<float>, Gain, MeterSource<float>> chain;
+    juce::dsp::Gain<float> inGain, outGain;
+    MeterSource<float> meterIn, meterOut;
+    WaveShaper<float> waveShaper;
     WaveShaperAttach<float> waveShaperAttach;
-    void updateParameters();
 };

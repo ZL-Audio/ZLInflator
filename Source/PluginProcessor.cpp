@@ -28,9 +28,10 @@ ZLInflatorAudioProcessor::ZLInflatorAudioProcessor()
 #endif
           parameters(*this, nullptr, juce::Identifier("ZLInflatorParameters"), zldsp::getParameterLayout()),
           states(*this, nullptr, juce::Identifier("ZLInflatorStates"), zlstate::getParameterLayout()),
-          waveShaperAttach(chain.get<waveShaper>(), parameters) {
-    chain.get<gain1>().setGainDecibels(zldsp::inputGain::defaultV);
-    chain.get<gain2>().setGainDecibels(zldsp::outputGain::defaultV);
+          waveShaper(*this),
+          waveShaperAttach(waveShaper, parameters) {
+    inGain.setGainDecibels(zldsp::inputGain::defaultV);
+    outGain.setGainDecibels(zldsp::outputGain::defaultV);
     parameters.addParameterListener(zldsp::inputGain::ID, this);
     parameters.addParameterListener(zldsp::outputGain::ID, this);
     waveShaperAttach.addListeners();
@@ -97,12 +98,20 @@ void ZLInflatorAudioProcessor::prepareToPlay(double sampleRate,
     reset();
     auto channels = static_cast<juce::uint32> (juce::jmin(getMainBusNumInputChannels(), getMainBusNumOutputChannels()));
     juce::dsp::ProcessSpec spec{sampleRate, static_cast<juce::uint32> (samplesPerBlock), channels};
-    chain.prepare(spec);
-    updateParameters();
+
+    inGain.prepare(spec);
+    outGain.prepare(spec);
+    meterIn.prepare(spec);
+    meterOut.prepare(spec);
+    waveShaper.prepare(spec);
 }
 
 void ZLInflatorAudioProcessor::reset() {
-    chain.reset();
+    inGain.reset();
+    outGain.reset();
+    meterIn.reset();
+    meterOut.reset();
+    waveShaper.reset();
 }
 
 void ZLInflatorAudioProcessor::releaseResources() {
@@ -127,20 +136,19 @@ bool ZLInflatorAudioProcessor::isBusesLayoutSupported(
 void ZLInflatorAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
                                             juce::MidiBuffer &midiMessages) {
     juce::ScopedNoDenormals noDenormals;
+    juce::ignoreUnused(midiMessages);
     auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    updateParameters();
-
     juce::dsp::AudioBlock<float> block(buffer);
-    chain.process(juce::dsp::ProcessContextReplacing<float>(block));
-}
-
-void ZLInflatorAudioProcessor::updateParameters() {
-    setLatencySamples(static_cast<int>(chain.get<waveShaper>().getLatencyInSamples()));
+    inGain.process(juce::dsp::ProcessContextReplacing<float>(block));
+    meterIn.process(juce::dsp::ProcessContextReplacing<float>(block));
+    waveShaper.process(juce::dsp::ProcessContextReplacing<float>(block));
+    outGain.process(juce::dsp::ProcessContextReplacing<float>(block));
+    meterOut.process(juce::dsp::ProcessContextReplacing<float>(block));
 }
 
 //==============================================================================
@@ -180,21 +188,21 @@ juce::AudioProcessor *JUCE_CALLTYPE createPluginFilter() {
 }
 
 MeterSource<float> *ZLInflatorAudioProcessor::getInputMeterSource() {
-    return &chain.get<meter1>();
+    return &meterIn;
 }
 
 MeterSource<float> *ZLInflatorAudioProcessor::getOutputMeterSource() {
-    return &chain.get<meter2>();
+    return &meterOut;
 }
 
 shaper::ShaperMixer<float> *ZLInflatorAudioProcessor::getShaperMixer() {
-    return chain.get<waveShaper>().getShaper();
+    return waveShaper.getShaper();
 }
 
 void ZLInflatorAudioProcessor::parameterChanged(const juce::String &parameterID, float newValue) {
     if (parameterID.equalsIgnoreCase(zldsp::inputGain::ID)) {
-        chain.get<gain1>().setGainDecibels(newValue);
+        inGain.setGainDecibels(newValue);
     } else if (parameterID.equalsIgnoreCase(zldsp::outputGain::ID)) {
-        chain.get<gain2>().setGainDecibels(newValue);
+        outGain.setGainDecibels(newValue);
     }
 }

@@ -101,16 +101,16 @@ namespace shaper {
     class SigmodShaper : public Shaper<FloatType> {
     public:
         void setParameters(FloatType curve) override {
-            trueCurve = curve * 2.5 + 0.5;
+            trueCurve = curve * FloatType(2.5) + FloatType(0.5);
             b = -basic(0);
-            k = static_cast<FloatType>(1) / (basic(1) + b);
+            k = FloatType(1) / (basic(1) + b);
         }
 
     private:
         FloatType trueCurve, k, b;
 
         FloatType basic(FloatType x) const override {
-            return static_cast<FloatType>(1) / (1 + std::exp(-trueCurve * x));
+            return FloatType(1) / (1 + std::exp(-trueCurve * x));
         }
 
         FloatType shape(FloatType x) const override {
@@ -125,7 +125,7 @@ namespace shaper {
             trueCurve = (curve * static_cast<FloatType>(0.999) + static_cast<FloatType>(0.001)) *
                         juce::MathConstants<FloatType>::pi / 2;
             b = -basic(0);
-            k = static_cast<FloatType>(1) / (basic(1) + b);
+            k = FloatType(1) / (basic(1) + b);
         }
 
     private:
