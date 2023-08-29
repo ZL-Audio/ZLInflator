@@ -4,7 +4,11 @@ permissions:
   contents: write
 
 on:
-  workflow_dispatch: # lets you run a build from the UI
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
 
 # When pushing new commits, cancel any running builds on that branch
 concurrency:
@@ -25,7 +29,7 @@ env:
 # all steps run in series
 jobs:
   build_and_test:
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} Check Status
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
@@ -51,14 +55,16 @@ jobs:
         sudo apt-get update && sudo apt install libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev xvfb ninja-build
         sudo /usr/bin/Xvfb $DISPLAY &
 
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - name: Get lastest tag
+      uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      id: get-latest-tag
       with:
-        submodules: true # Get JUCE populated
+        fallback: 0.0.0
 
     - name: Setup Environment Variables
       shell: bash
       run: |
+        echo "${{steps.get-latest-tag.outputs.tag}}" > VERSION
         VERSION=$(cat VERSION)
         echo "ARTIFACTS_PATH=${{ env.BUILD_DIR }}/${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}" >> $GITHUB_ENV
         echo "VST3_PATH=${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}/VST3/${{ env.PRODUCT_NAME }}.vst3" >> $GITHUB_ENV

@@ -98,9 +98,16 @@ jobs:
       with:
         submodules: true # Get JUCE populated
 
+    - name: Get lastest tag
+      uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      id: get-latest-tag
+      with:
+        fallback: 0.0.0
+
     - name: Setup Environment Variables
       shell: bash
       run: |
+        echo "${{steps.get-latest-tag.outputs.tag}}" > VERSION
         VERSION=$(cat VERSION)
         echo "ARTIFACTS_PATH=${{ env.BUILD_DIR }}/${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}" >> $GITHUB_ENV
         echo "VST3_PATH=${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}/VST3/${{ env.PRODUCT_NAME }}.vst3" >> $GITHUB_ENV
