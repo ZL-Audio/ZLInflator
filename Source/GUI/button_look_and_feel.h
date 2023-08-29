@@ -28,7 +28,7 @@ namespace zlinterface {
             auto bounds = button.getLocalBounds().toFloat();
             // draw button
             bounds = uiBase->fillRoundedShadowRectangle(g, bounds, uiBase->getFontSize() * 0.5f, {});
-            uiBase->fillRoundedInnerShadowRectangle(g, bounds, uiBase->getFontSize() * 0.5f, {.blurRadius=0.3f, .flip=true});
+            uiBase->fillRoundedInnerShadowRectangle(g, bounds, uiBase->getFontSize() * 0.5f, {.blurRadius=0.45f, .flip=true});
             // draw ON/OFF
             if (editable.load()) {
                 g.setColour(uiBase->getTextColor());

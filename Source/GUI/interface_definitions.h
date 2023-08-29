@@ -28,7 +28,7 @@ namespace zlinterface {
                     {},
                     {.TextColor = juce::Colour(255 - 8, 255 - 9, 255 - 11),
                             .BackgroundColor = juce::Colour(255 - 214, 255 - 223, 255 - 236),
-                            .DarkShadowColor = juce::Colour(255 - 237, 255 - 246, 255 - 255),
+                            .DarkShadowColor = juce::Colour(0, 0, 0),
                             .BrightShadowColor = juce::Colour(255 - 168, 255 - 172, 255 - 178),
                             .LineColor1 = juce::Colour(255 - 139, 255, 255)
                     }

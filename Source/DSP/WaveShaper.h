@@ -163,7 +163,7 @@ public:
         for (size_t i = 0; i < numBands - 1; ++i) {
             filters[i].update(overSampleFactor);
         }
-        processorRef->setLatencySamples(overSamplers[idxSampler]->getLatencyInSamples());
+        processorRef->setLatencySamples(static_cast<int>(overSamplers[idxSampler]->getLatencyInSamples()));
     }
 
     void setTypes(size_t type1, size_t type2) {

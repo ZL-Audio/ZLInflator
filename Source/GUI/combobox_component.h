@@ -45,7 +45,7 @@ namespace zlinterface {
             auto bound = getLocalBounds().toFloat();
             auto labelBound = bound.removeFromTop(labelHeight * bound.getHeight());
             label.setBounds(labelBound.toNearestInt());
-            bound = bound.withSizeKeepingCentre(bound.getWidth(), bound.getWidth() * boxRatio);
+//            bound = bound.withSizeKeepingCentre(bound.getWidth(), bound.getWidth() * boxRatio);
             comboBox.setBounds(bound.toNearestInt());
         }
 
