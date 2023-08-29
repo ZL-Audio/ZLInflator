@@ -55,6 +55,11 @@ jobs:
         sudo apt-get update && sudo apt install libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev xvfb ninja-build
         sudo /usr/bin/Xvfb $DISPLAY &
 
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        submodules: true # Get JUCE populated
+
     - name: Get lastest tag
       uses: "WyriHaximus/github-action-get-previous-tag@v1"
       id: get-latest-tag
