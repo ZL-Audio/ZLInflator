@@ -30,15 +30,20 @@ namespace zlpanel {
         tempLogo->replaceColour(juce::Colour(0, 0, 0), uiBase->getTextColor());
 
         auto bound = getLocalBounds().toFloat();
-        auto padding = juce::jmin(bound.getWidth() * 0.1f, bound.getHeight() * 0.1f);
+        auto padding = juce::jmin(uiBase->getFontSize() * 0.5f, uiBase->getFontSize() * 0.5f);
         bound = bound.withSizeKeepingCentre(bound.getWidth() - padding, bound.getHeight() - padding);
+
+        auto boundToUse = juce::Rectangle<float>(bound.getWidth(), uiBase->getFontSize() * 2.f);
+        bound = justification.appliedToRectangle(boundToUse, bound);
 
         auto logoWOH = static_cast<float>(logoDrawable->getWidth()) / static_cast<float>(logoDrawable->getHeight());
         auto brandWOH = static_cast<float>(brandDrawable->getWidth()) / static_cast<float>(brandDrawable->getHeight());
         auto widthOverHeight = logoWOH + brandWOH + 0.1f;
         auto width = juce::jmin(bound.getWidth(), bound.getHeight() * widthOverHeight);
         auto height = juce::jmin(bound.getHeight(), bound.getWidth() / widthOverHeight);
-        bound = bound.withSizeKeepingCentre(width, height);
+
+        boundToUse = juce::Rectangle<float>(width, height);
+        bound = justification.appliedToRectangle(boundToUse, bound);
 
         tempBrand->setTransform(
                 juce::AffineTransform::scale(bound.getHeight() / static_cast<float>(brandDrawable->getHeight())));
@@ -57,6 +62,10 @@ namespace zlpanel {
         processorRef->states.getParameter(zlstate::uiStyle::ID)->setValueNotifyingHost(
                 zlstate::uiStyle::convertTo01(static_cast<float>(styleID)));
         triggerAsyncUpdate();
+    }
+
+    void LogoPanel::setJustification(int justificationFlags) {
+        justification = justificationFlags;
     }
 
     void LogoPanel::handleAsyncUpdate() {

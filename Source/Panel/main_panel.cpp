@@ -34,11 +34,16 @@ void MainPanel::paint(juce::Graphics &g) {
     auto bound = getLocalBounds().toFloat();
     float fontSize = bound.getHeight() * 0.048f;
     bound = uiBase.fillRoundedShadowRectangle(g, bound, fontSize * 0.5f, {});
-    uiBase.fillRoundedInnerShadowRectangle(g, bound, fontSize * 0.5f, {.flip=true});
+    uiBase.fillRoundedInnerShadowRectangle(g, bound, fontSize * 0.5f, {.blurRadius=0.45f, .flip=true});
 }
 
 void MainPanel::resized() {
-    uiBase.setFontSize(static_cast<float>(getLocalBounds().getHeight()) * 0.048f);
+    auto bound = getLocalBounds().toFloat();
+    auto fontSize = bound.getHeight() * 0.048f;
+    bound = zlinterface::getRoundedShadowRectangleArea(bound, fontSize * 0.5f, {});
+    bound = zlinterface::getRoundedShadowRectangleArea(bound, fontSize * 0.5f, {});
+
+    uiBase.setFontSize(fontSize);
 
     juce::Grid grid;
     using Track = juce::Grid::TrackInfo;
@@ -54,8 +59,5 @@ void MainPanel::resized() {
             juce::GridItem(meterPanel).withArea(1, 3, 3, 4),
     };
 
-    auto bound = getLocalBounds().toFloat();
-    auto padding = bound.getHeight() * 0.08f;
-    bound = bound.withSizeKeepingCentre(bound.getWidth() - padding, bound.getHeight() - padding);
     grid.performLayout(bound.toNearestInt());
 }

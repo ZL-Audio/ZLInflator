@@ -29,10 +29,13 @@ namespace zlpanel {
 
         void mouseDoubleClick(const juce::MouseEvent &event) override;
 
+        void setJustification(int justificationFlags);
+
     private:
         const std::unique_ptr<juce::Drawable> brandDrawable, logoDrawable;
         zlinterface::UIBase *uiBase;
         ZLInflatorAudioProcessor *processorRef;
+        juce::Justification justification = juce::Justification::topLeft;
 
         void handleAsyncUpdate() override;
     };

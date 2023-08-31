@@ -30,10 +30,10 @@ namespace zlinterface {
             auto bound = bounds.toFloat();
             bound = uiBase->fillRoundedShadowRectangle(g, bound,
                                                        uiBase->getFontSize() * .5f,
-                                                       {.blurRadius=.15f});
+                                                       {.blurRadius=.25f});
             uiBase->fillRoundedInnerShadowRectangle(g, bound,
                                                     uiBase->getFontSize() * .5f,
-                                                    {.blurRadius=.15f, .flip=true});
+                                                    {.blurRadius=.25f, .flip=true});
             auto numberBound = bound;
 
             auto meterWidth = bound.getWidth() / static_cast<float>(rms.size());

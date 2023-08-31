@@ -63,7 +63,7 @@ namespace zlstate {
         auto static constexpr name = "NA";
         inline static const int minV = 360;
         inline static const int maxV = 3600;
-        inline static const int defaultV = 720;
+        inline static const int defaultV = 511;
         inline auto static const range =
                 juce::NormalisableRange<float>(minV, maxV, 1.f);
     };
@@ -74,7 +74,7 @@ namespace zlstate {
         auto static constexpr name = "NA";
         inline static const int minV = 150;
         inline static const int maxV = 1500;
-        inline static const int defaultV = 300;
+        inline static const int defaultV = 213;
         inline auto static const range =
                 juce::NormalisableRange<float>(minV, maxV, 1.f);
     };
