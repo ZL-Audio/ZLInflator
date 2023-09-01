@@ -45,8 +45,6 @@ option(JUCE_ENABLE_MODULE_SOURCE_GROUPS "Show all module sources in IDE projects
 # On Github Actions, it's managed by actions/checkout
 add_subdirectory(JUCE)
 
-add_subdirectory (modules/melatonin_inspector)
-
 # Check the readme at `docs/CMake API.md` in the JUCE repo for full config
 juce_add_plugin("${PROJECT_NAME}"
         # VERSION 0.0.1                               # Set this if the plugin version is different to the project version

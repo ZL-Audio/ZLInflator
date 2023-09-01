@@ -12,10 +12,6 @@ You should have received a copy of the GNU General Public License along with ZLI
 
 #pragma once
 
-#if DEBUG
-#include "../modules/melatonin_inspector/melatonin_inspector.h"
-#endif
-
 #include "Panel/main_panel.h"
 #include "State/state_definitions.h"
 #include "PluginProcessor.h"
@@ -39,9 +35,6 @@ private:
     ZLInflatorAudioProcessor &audioProcessor;
     MainPanel mainPanel;
     juce::Value lastUIWidth, lastUIHeight;
-#if DEBUG
-    melatonin::Inspector inspector { *this };
-#endif
     void valueChanged(juce::Value &) override;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZLInflatorAudioProcessorEditor)
 };
