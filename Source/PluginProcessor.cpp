@@ -26,8 +26,9 @@ ZLInflatorAudioProcessor::ZLInflatorAudioProcessor()
 #endif
 ),
 #endif
+          dummyProcessor(),
           parameters(*this, nullptr, juce::Identifier("ZLInflatorParameters"), zldsp::getParameterLayout()),
-          states(*this, nullptr, juce::Identifier("ZLInflatorStates"), zlstate::getParameterLayout()),
+          states(dummyProcessor, nullptr, juce::Identifier("ZLInflatorStates"), zlstate::getParameterLayout()),
           waveShaper(*this),
           waveShaperAttach(waveShaper, parameters) {
     inGain.setGainDecibels(zldsp::inputGain::defaultV);

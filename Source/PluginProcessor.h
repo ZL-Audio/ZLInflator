@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License along with ZLI
 #include "DSP/MeterSource.h"
 #include "DSP/WaveShaper.h"
 #include "GUI/interface_definitions.h"
+#include "State/dummy_processor.h"
 #include "State/state_definitions.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
@@ -31,6 +32,7 @@ class ZLInflatorAudioProcessor : public juce::AudioProcessor,
 #endif
 {
 public:
+    DummyProcessor dummyProcessor;
     juce::AudioProcessorValueTreeState parameters;
     juce::AudioProcessorValueTreeState states;
 
