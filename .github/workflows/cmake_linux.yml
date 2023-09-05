@@ -56,7 +56,7 @@ jobs:
         sudo /usr/bin/Xvfb $DISPLAY &
 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: true # Get JUCE populated
 
