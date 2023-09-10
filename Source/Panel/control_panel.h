@@ -18,10 +18,10 @@ You should have received a copy of the GNU General Public License along with ZLI
 #include "../GUI/combobox_component.h"
 #include "../DSP/dsp_defines.h"
 #include "panel_definitions.h"
-#include <BinaryData.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-class ControlPanel : public juce::Component {
+class ControlPanel : public juce::Component, public juce::AudioProcessorValueTreeState::Listener,
+                     private juce::AsyncUpdater {
 public:
     explicit ControlPanel(juce::AudioProcessorValueTreeState &apvts, zlinterface::UIBase &base);
 
@@ -31,6 +31,8 @@ public:
     void paint(juce::Graphics &) override;
 
     void resized() override;
+
+    void parameterChanged(const juce::String &parameterID, float newValue) override;
 
 private:
     std::unique_ptr<zlinterface::RotarySliderComponent> inputGainSlider, outputGainSlider;
@@ -50,6 +52,13 @@ private:
     std::unique_ptr<zlinterface::ComboboxComponent> style1Box, style2Box;
     std::array<std::unique_ptr<zlinterface::ComboboxComponent> *, 2> comboBoxList{&style1Box, &style2Box};
     juce::OwnedArray<juce::AudioProcessorValueTreeState::ComboBoxAttachment> comboboxAttachments;
+
+    juce::AudioProcessorValueTreeState *parameters;
+    std::array<juce::String, 3> visibleChangeIDs = {zldsp::style1::ID, zldsp::style2::ID, zldsp::bandSplit::ID};
+
+    void handleAsyncUpdate() override;
+
+    void handleParameterChanges(const juce::String &parameterID, float newValue);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ControlPanel)
 };

@@ -25,12 +25,25 @@ ControlPanel::ControlPanel(juce::AudioProcessorValueTreeState &apvts, zlinterfac
     // init combobox
     std::array<std::string, 2> comboboxID{zldsp::style1::ID, zldsp::style2::ID};
     zlpanel::attachBoxes(*this, comboBoxList, comboboxAttachments, comboboxID, apvts, base);
+
+    parameters = &apvts;
+
+    for (const juce::String& visibleChangeID : visibleChangeIDs) {
+        handleParameterChanges(visibleChangeID, parameters->getRawParameterValue(visibleChangeID)->load());
+        parameters->addParameterListener(visibleChangeID, this);
+    }
 }
 
-ControlPanel::~ControlPanel() = default;
+ControlPanel::~ControlPanel() {
+    for (const juce::String& visibleChangeID : visibleChangeIDs) {
+        parameters->removeParameterListener(visibleChangeID, this);
+    }
+}
 
 //==============================================================================
-void ControlPanel::paint(juce::Graphics &g) {}
+void ControlPanel::paint(juce::Graphics &g) {
+    juce::ignoreUnused(g);
+}
 
 void ControlPanel::resized() {
     juce::Grid grid;
@@ -56,6 +69,36 @@ void ControlPanel::resized() {
     items.add(*curve2Slider);
 
     grid.items = items;
-
     grid.performLayout(getLocalBounds());
+}
+
+void ControlPanel::parameterChanged(const juce::String &parameterID, float newValue) {
+    handleParameterChanges(parameterID, newValue);
+    triggerAsyncUpdate();
+}
+
+void ControlPanel::handleParameterChanges(const juce::String &parameterID, float newValue) {
+    if (parameterID == zldsp::style1::ID) {
+        auto index = static_cast<int>(newValue);
+        if (index == zldsp::style1::Identity || index == zldsp::style1::Quadratic || index == zldsp::style1::Cubic) {
+            curve1Slider->setEditable(false);
+        } else {
+            curve1Slider->setEditable(true);
+        }
+    } else if (parameterID == zldsp::style2::ID) {
+        auto index = static_cast<int>(newValue);
+        if (index == zldsp::style2::Identity || index == zldsp::style2::Quadratic || index == zldsp::style2::Cubic) {
+            curve2Slider->setEditable(false);
+        } else {
+            curve2Slider->setEditable(true);
+        }
+    } else if (parameterID == zldsp::bandSplit::ID) {
+        auto f = static_cast<bool>(newValue);
+        lowSplitSlider->setEditable(f);
+        highSplitSlider->setEditable(f);
+    }
+}
+
+void ControlPanel::handleAsyncUpdate() {
+    repaint();
 }
