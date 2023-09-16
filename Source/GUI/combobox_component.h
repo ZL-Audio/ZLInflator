@@ -59,7 +59,6 @@ namespace zlinterface {
         void setEditable(bool f) {
             myLookAndFeel.setEditable(f);
             nameLookAndFeel.setEditable(f);
-            repaint();
         }
 
     private:
