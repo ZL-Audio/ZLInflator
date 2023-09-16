@@ -1,10 +1,14 @@
-name: Release
+name: macOS/Windows/Linux Test
 
 permissions:
   contents: write
 
 on:
-  workflow_dispatch: # lets you run a build from the UI
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
 
 # When pushing new commits, cancel any running builds on that branch
 concurrency:
@@ -25,14 +29,14 @@ env:
 # all steps run in series
 jobs:
   build_and_test:
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} Check Status
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
         include:
           - name: Linux
-            os: ubuntu-22.04
+            os: ubuntu-latest
             pluginval-binary: ./pluginval
             ccache: ccache
           - name: macOS
@@ -98,16 +102,15 @@ jobs:
       with:
         submodules: true # Get JUCE populated
 
-    - name: Get lastest tag
-      uses: "WyriHaximus/github-action-get-previous-tag@v1"
-      id: get-latest-tag
+    - name: Install boost
+      uses: MarkusJx/install-boost@v2.4.4
+      id: install-boost
       with:
-        fallback: 0.0.0
+        boost_version: 1.80.0
 
     - name: Setup Environment Variables
       shell: bash
       run: |
-        echo "${{steps.get-latest-tag.outputs.tag}}" > VERSION
         VERSION=$(cat VERSION)
         echo "ARTIFACTS_PATH=${{ env.BUILD_DIR }}/${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}" >> $GITHUB_ENV
         echo "VST3_PATH=${{ env.PROJECT_NAME }}_artefacts/${{ env.BUILD_TYPE }}/VST3/${{ env.PRODUCT_NAME }}.vst3" >> $GITHUB_ENV
@@ -121,7 +124,7 @@ jobs:
         key: v3-${{ matrix.os }}-${{ matrix.type }}
         variant: ${{ matrix.ccache }}
 
-    - name: Import Certificates (macOS)
+    - name: Import certificates (macOS)
       uses: apple-actions/import-codesign-certs@v2
       if: ${{ matrix.name == 'macOS' }}
       with:
@@ -131,18 +134,50 @@ jobs:
     - name: Configure
       shell: bash
       run: cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE}} -DCMAKE_C_COMPILER_LAUNCHER=${{ matrix.ccache }} -DCMAKE_CXX_COMPILER_LAUNCHER=${{ matrix.ccache }} -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" .
+      env:
+        BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
     - name: Build
       shell: bash
       run: cmake --build ${{ env.BUILD_DIR }} --config ${{ env.BUILD_TYPE }} --parallel 4
 
-    - name: Pluginval
+    - name: Pluginval setup
       working-directory: ${{ env.BUILD_DIR }}
       shell: bash
       run: |
         curl -LO "https://github.com/Tracktion/pluginval/releases/download/v1.0.3/pluginval_${{ matrix.name }}.zip"
         7z x pluginval_${{ matrix.name }}.zip
-        ${{ matrix.pluginval-binary }} --strictness-level 10 --verbose --validate "${{ env.VST3_PATH }}"
+
+    - name: Setup Pluginval random seed
+      uses: josStorer/get-current-time@v2
+      id: current-time
+      with:
+        format: YYYYMMDD
+
+    - name: Pluginval VST3 validations
+      working-directory: ${{ env.BUILD_DIR }}
+      shell: bash
+      run: |
+        ${{ matrix.pluginval-binary }} --verbose --validate "${{ env.VST3_PATH }}"
+      env:
+        STRICTNESS_LEVEL: 10
+        TIMEOUT_MS: 720000
+        REPEAT: 4
+        RANDOM_SEED: "${{ steps.current-time.outputs.formattedTime }}"
+
+    - name: Pluginval AU validations (macOS)
+      working-directory: ${{ env.BUILD_DIR }}
+      if: ${{ matrix.name == 'macOS' }}
+      shell: bash
+      run: |
+        sudo cp -r "${{ env.AU_PATH }}" "/Library/Audio/Plug-ins/components"
+        sudo killall -9 AudioComponentRegistrar
+        ${{ matrix.pluginval-binary }} --verbose --validate "/Library/Audio/Plug-ins/components/${{ env.PRODUCT_NAME }}.component"
+      env:
+        STRICTNESS_LEVEL: 10
+        TIMEOUT_MS: 720000
+        REPEAT: 2
+        RANDOM_SEED: "${{ steps.current-time.outputs.formattedTime }}"
 
     - name: Codesign (macOS)
       working-directory: ${{ env.BUILD_DIR }}
@@ -173,51 +208,17 @@ jobs:
       working-directory: ${{ env.ARTIFACTS_PATH }}
       run: 7z a -tzip ${{ env.INSTALLER_NAME }}.zip .
 
-    - name: Generate Installer (Windows)
+    - name: Generate installer (Windows)
       if: ${{ matrix.name == 'Windows' }}
       shell: bash
       run: |
         iscc "packaging\installer.iss"
         mv "packaging/Output/${{ env.INSTALLER_NAME }}.exe" "${{ env.ARTIFACTS_PATH }}/"
 
-    - name: Upload Exe (Windows)
-      if: ${{ matrix.name == 'Windows' }}
-      uses: actions/upload-artifact@v3
+    - name: Delete artifacts
+      uses: geekyeggo/delete-artifact@v2
       with:
-        name: ${{ env.INSTALLER_NAME }}.exe
-        path: '${{ env.ARTIFACTS_PATH }}/${{ env.INSTALLER_NAME }}.exe'
-
-    - name: Upload Zip (Linux)
-      if: ${{ matrix.name == 'Linux' }}
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.INSTALLER_NAME }}.zip
-        path: '${{ env.ARTIFACTS_PATH }}/${{ env.INSTALLER_NAME }}.zip'
-
-    - name: Upload DMG (MacOS)
-      if: ${{ matrix.name == 'macOS' }}
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.INSTALLER_NAME }}.dmg
-        path: packaging/${{ env.INSTALLER_NAME }}.dmg
-
-
-  release:
-    if: contains(github.ref, 'tags/')
-    runs-on: ubuntu-latest
-    needs: build_and_test
-
-    steps:
-    - name: Get Artifacts
-      uses: actions/download-artifact@v3
-
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        prerelease: true
-        # download-artifact puts these files in their own dirs...
-        # Using globs sidesteps having to pass the version around
-        files: |
-          */*.exe
-          */*.zip
-          */*.dmg
+        name: |
+          ${{ env.INSTALLER_NAME }}.zip
+          ${{ env.INSTALLER_NAME }}.exe
+          ${{ env.INSTALLER_NAME }}.dmg
