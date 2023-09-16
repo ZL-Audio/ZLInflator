@@ -4,6 +4,7 @@
 </p>
 
 # ZLInflator
+![pluginval](<https://github.com/ZL-Audio/ZLInflator/workflows/macOS\/Windows\/Linux Test/badge.svg?branch=main>) 
 
 ZLInflator is a distortion/saturation plugin to increase loudness.
 
