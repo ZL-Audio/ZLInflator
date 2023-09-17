@@ -9,7 +9,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 **/.DS_Store
-./VERSION
+VERSION
 
 # It's nice to have the Builds folder exist, to remind us where it is
 Builds/*
@@ -18,7 +18,7 @@ Builds/*
 # This should never exist
 Install/*
 
-# Running CTest makes a bunch o junk
+# Running CTest makes a bunch of junk
 Testing
 
 # IDE config
