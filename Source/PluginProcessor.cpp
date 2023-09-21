@@ -167,7 +167,6 @@ void ZLInflatorAudioProcessor::getStateInformation(
         juce::MemoryBlock &destData) {
     auto tempTree = juce::ValueTree("ZLInflatorParaState");
     tempTree.appendChild(parameters.copyState(), nullptr);
-    tempTree.appendChild(states.copyState(), nullptr);
     std::unique_ptr<juce::XmlElement> xml(tempTree.createXml());
     copyXmlToBinary(*xml, destData);
 }
@@ -178,7 +177,6 @@ void ZLInflatorAudioProcessor::setStateInformation(const void *data,
     if (xmlState != nullptr && xmlState->hasTagName("ZLInflatorParaState")) {
         auto tempTree = juce::ValueTree::fromXml(*xmlState);
         parameters.replaceState(tempTree.getChildWithName(parameters.state.getType()));
-        states.replaceState(tempTree.getChildWithName(states.state.getType()));
     }
 }
 

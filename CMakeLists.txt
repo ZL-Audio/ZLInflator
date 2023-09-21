@@ -100,6 +100,8 @@ set(SourceFiles
         Source/PluginProcessor.cpp
 
         Source/State/state_definitions.h
+        Source/State/property.h
+        Source/State/property.cpp
 
         Source/DSP/dsp_defines.h
         Source/DSP/WaveShaper.h

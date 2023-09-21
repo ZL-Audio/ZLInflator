@@ -14,13 +14,16 @@ You should have received a copy of the GNU General Public License along with ZLI
 
 #include "Panel/main_panel.h"
 #include "State/state_definitions.h"
+#include "State/property.h"
 #include "PluginProcessor.h"
 
 //==============================================================================
 /**
 */
 class ZLInflatorAudioProcessorEditor : public juce::AudioProcessorEditor,
-                                       private juce::Value::Listener{
+                                       private juce::Value::Listener, 
+                                       private juce::AudioProcessorValueTreeState::Listener,
+                                       private juce::AsyncUpdater {
 public:
     explicit ZLInflatorAudioProcessorEditor(ZLInflatorAudioProcessor &);
 
@@ -32,9 +35,18 @@ public:
     void resized() override;
 
 private:
-    ZLInflatorAudioProcessor &audioProcessor;
+    ZLInflatorAudioProcessor &processorRef;
+    zlstate::Property property;
     MainPanel mainPanel;
     juce::Value lastUIWidth, lastUIHeight;
+    constexpr const static std::array IDs{zlstate::uiStyle::ID,
+                                          zlstate::windowW::ID, zlstate::windowH::ID};
+
     void valueChanged(juce::Value &) override;
+
+    void parameterChanged(const juce::String &parameterID, float newValue) override;
+
+    void handleAsyncUpdate() override;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZLInflatorAudioProcessorEditor)
 };

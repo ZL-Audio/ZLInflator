@@ -15,8 +15,13 @@ You should have received a copy of the GNU General Public License along with ZLI
 
 //==============================================================================
 ZLInflatorAudioProcessorEditor::ZLInflatorAudioProcessorEditor(ZLInflatorAudioProcessor &p) :
-        AudioProcessorEditor(&p), audioProcessor(p),
+        AudioProcessorEditor(&p), processorRef(p),
+        property(p.states),
         mainPanel(p, p.getInputMeterSource(), p.getOutputMeterSource(), p.getShaperMixer()) {
+
+    for (auto &ID: IDs) {
+        processorRef.states.addParameterListener(ID, this);
+    }
     // set font
     auto sourceCodePro = juce::Typeface::createSystemTypefaceFor(BinaryData::OpenSansSemiBold_ttf,
                                                                  BinaryData::OpenSansSemiBold_ttfSize);
@@ -38,6 +43,9 @@ ZLInflatorAudioProcessorEditor::ZLInflatorAudioProcessorEditor(ZLInflatorAudioPr
 }
 
 ZLInflatorAudioProcessorEditor::~ZLInflatorAudioProcessorEditor() {
+    for (auto &ID: IDs) {
+        processorRef.states.removeParameterListener(ID, this);
+    }
 }
 
 //==============================================================================
@@ -53,4 +61,13 @@ void ZLInflatorAudioProcessorEditor::resized() {
 
 void ZLInflatorAudioProcessorEditor::valueChanged(juce::Value &) {
     setSize(lastUIWidth.getValue(), lastUIHeight.getValue());
+}
+
+void ZLInflatorAudioProcessorEditor::parameterChanged(const juce::String &parameterID, float newValue) {
+    juce::ignoreUnused(parameterID, newValue);
+    triggerAsyncUpdate();
+}
+
+void ZLInflatorAudioProcessorEditor::handleAsyncUpdate() {
+    property.saveAPVTS(processorRef.states);
 }
