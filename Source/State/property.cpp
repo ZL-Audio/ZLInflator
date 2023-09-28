@@ -22,6 +22,7 @@ namespace zlstate {
     }
 
     void Property::loadAPVTS(juce::AudioProcessorValueTreeState &apvts) {
+        const juce::ScopedReadLock myScopedLock (readWriteLock);
         auto file = uiFile->getFile();
         if (auto xml = juce::XmlDocument::parse (file)) {
             apvts.replaceState(juce::ValueTree::fromXml(*xml));
@@ -29,6 +30,7 @@ namespace zlstate {
     }
 
     void Property::saveAPVTS(juce::AudioProcessorValueTreeState &apvts) {
+        const juce::ScopedWriteLock myScopedLock (readWriteLock);
         auto file = uiFile->getFile();
         if (auto xml = apvts.copyState().createXml()) {
             xml->writeTo(file);
