@@ -28,12 +28,9 @@ namespace zlinterface {
                         const std::vector<float> &peakMax) {
 
             auto bound = bounds.toFloat();
-            bound = uiBase->fillRoundedShadowRectangle(g, bound,
-                                                       uiBase->getFontSize() * .5f,
-                                                       {.blurRadius=.25f});
-            uiBase->fillRoundedInnerShadowRectangle(g, bound,
-                                                    uiBase->getFontSize() * .5f,
-                                                    {.blurRadius=.25f, .flip=true});
+            bound = uiBase->getRoundedShadowRectangleArea(bound,
+                                                          uiBase->getFontSize() * .5f,
+                                                          {.blurRadius=.25f});
             auto numberBound = bound;
 
             auto meterWidth = bound.getWidth() / static_cast<float>(rms.size());

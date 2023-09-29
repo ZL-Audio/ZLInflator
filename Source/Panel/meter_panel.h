@@ -28,6 +28,7 @@ public:
     void resized() override;
 
 private:
+    zlinterface::MeterBackgroundComponent inputBackground, outputBackground;
     zlinterface::MeterComponent inputMeter, outputMeter;
 };
 

@@ -19,33 +19,60 @@
 
 namespace zlinterface {
 
-    class MeterComponent : public juce::Component, private juce::Timer {
+    class MeterBackgroundComponent : public juce::Component {
     public:
-        explicit MeterComponent(const juce::String &labelText,
-                                MeterSource<float> *meterSource,
+        explicit MeterBackgroundComponent(const juce::String &labelText, UIBase &base) :
+                nameLookAndFeel(base) {
+            uiBase = &base;
+            label.setText(labelText, juce::dontSendNotification);
+            label.setLookAndFeel(&nameLookAndFeel);
+            addAndMakeVisible(label);
+        }
+
+        ~MeterBackgroundComponent() override {
+            setLookAndFeel(nullptr);
+            label.setLookAndFeel(nullptr);
+        }
+
+        void paint(juce::Graphics &g) override {
+            auto bound = getLocalBounds().toFloat();
+            bound = bound.withTrimmedBottom(bound.getHeight() * 0.05f);
+            bound = uiBase->fillRoundedShadowRectangle(g, bound,
+                                                       uiBase->getFontSize() * .5f,
+                                                       {.blurRadius=.25f});
+            uiBase->fillRoundedInnerShadowRectangle(g, bound,
+                                                    uiBase->getFontSize() * .5f,
+                                                    {.blurRadius=.25f, .flip=true});
+        }
+
+        void resized() override {
+            label.setBoundsRelative(0.0f, 0.95f, 1.0f, 0.05f);
+        }
+
+    private:
+        UIBase *uiBase;
+        juce::Label label;
+        NameLookAndFeel nameLookAndFeel;
+    };
+
+    class MeterComponent : public juce::Component, private juce::Timer, private juce::AsyncUpdater {
+    public:
+        explicit MeterComponent(MeterSource<float> *meterSource,
                                 float minV, float maxV,
                                 UIBase &base) :
                 myLookAndFeel(base), nameLookAndFeel(base) {
+            uiBase = &base;
             // set meter
             source = meterSource;
             source->setDecayRate(27.f / zlinterface::RefreshFreqHz);
             myLookAndFeel.setRMSRange(minV, maxV);
             setLookAndFeel(&myLookAndFeel);
             startTimerHz(zlinterface::RefreshFreqHz);
-            // set label
-            label.setText(labelText, juce::dontSendNotification);
-            label.setLookAndFeel(&nameLookAndFeel);
-            addAndMakeVisible(label);
         }
 
         ~MeterComponent() override {
             stopTimer();
             setLookAndFeel(nullptr);
-            label.setLookAndFeel(nullptr);
-        }
-
-        void resized() override {
-            label.setBoundsRelative(0.0f, 0.95f, 1.0f, 0.05f);
         }
 
         void paint(juce::Graphics &g) override {
@@ -68,16 +95,19 @@ namespace zlinterface {
         }
 
         void timerCallback() override {
-            repaint();
+            triggerAsyncUpdate();
         }
 
     private:
         MeterSource<float> *source = nullptr;
-        juce::Label label;
         MeterLookAndFeel myLookAndFeel;
         NameLookAndFeel nameLookAndFeel;
 
         UIBase *uiBase;
+
+        void handleAsyncUpdate() override {
+            repaint();
+        }
     };
 }
 

@@ -13,8 +13,12 @@ You should have received a copy of the GNU General Public License along with ZLI
 #include "meter_panel.h"
 
 MeterPanel::MeterPanel(MeterSource<float> *input, MeterSource<float> *output, zlinterface::UIBase &base) :
-inputMeter("IN", input, -40.0f, 0.0f, base),
-outputMeter("OUT", output, -40.0f, 0.0f, base){
+        inputBackground("IN", base),
+        outputBackground("OUT", base),
+        inputMeter(input, -40.0f, 0.0f, base),
+        outputMeter(output, -40.0f, 0.0f, base) {
+    addAndMakeVisible(inputBackground);
+    addAndMakeVisible(outputBackground);
     addAndMakeVisible(inputMeter);
     addAndMakeVisible(outputMeter);
 }
@@ -26,6 +30,8 @@ void MeterPanel::paint(juce::Graphics &) {}
 void MeterPanel::resized() {
     auto bound = getLocalBounds().toFloat();
     auto inputBound = bound.removeFromLeft(bound.getWidth() * 0.5f);
+    inputBackground.setBounds(inputBound.toNearestInt());
+    outputBackground.setBounds(bound.toNearestInt());
     inputMeter.setBounds(inputBound.toNearestInt());
     outputMeter.setBounds(bound.toNearestInt());
 }
