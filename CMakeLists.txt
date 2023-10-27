@@ -93,48 +93,7 @@ juce_add_plugin("${PROJECT_NAME}"
 target_compile_features("${PROJECT_NAME}" PRIVATE cxx_std_20)
 
 # Manually list all .h and .cpp files for the plugin
-set(SourceFiles
-        Source/PluginEditor.h
-        Source/PluginEditor.cpp
-        Source/PluginProcessor.h
-        Source/PluginProcessor.cpp
-
-        Source/State/state_definitions.h
-        Source/State/property.h
-        Source/State/property.cpp
-
-        Source/DSP/dsp_defines.h
-        Source/DSP/WaveShaper.h
-        Source/DSP/ShaperFunctions.h
-        Source/DSP/MeterSource.h
-
-        Source/Panel/panel_definitions.h
-        Source/Panel/control_panel.h
-        Source/Panel/control_panel.cpp
-        Source/Panel/top_panel.h
-        Source/Panel/top_panel.cpp
-        Source/Panel/logo_panel.h
-        Source/Panel/logo_panel.cpp
-        Source/Panel/meter_panel.h
-        Source/Panel/meter_panel.cpp
-        Source/Panel/plot_panel.h
-        Source/Panel/plot_panel.cpp
-        Source/Panel/main_panel.h
-        Source/Panel/main_panel.cpp
-
-        Source/GUI/interface_definitions.h
-        Source/GUI/name_look_and_feel.h
-        Source/GUI/button_look_and_feel.h
-        Source/GUI/button_component.h
-        Source/GUI/rotary_slider_look_and_feel.h
-        Source/GUI/rotary_slider_component.h
-        Source/GUI/linear_slider_look_and_feel.h
-        Source/GUI/linear_slider_component.h
-        Source/GUI/meter_look_and_feel.h
-        Source/GUI/meter_component.h
-        Source/GUI/shaper_plot_component.h
-        Source/GUI/combobox_look_and_feel.h
-        Source/GUI/combobox_component.h)
+file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Source/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/Source/*.h")
 
 target_sources("${PROJECT_NAME}" PRIVATE ${SourceFiles})
 
@@ -183,7 +142,9 @@ target_compile_definitions("${PROJECT_NAME}"
         JUCE_WEB_BROWSER=0  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` call
         JUCE_USE_CURL=0     # If you remove this, add `NEEDS_CURL TRUE` to the `juce_add_plugin` call
         JUCE_VST3_CAN_REPLACE_VST2=0
-        JUCE_DISPLAY_SPLASH_SCREEN=0)
+        JUCE_DISPLAY_SPLASH_SCREEN=0
+        JUCE_COREGRAPHICS_RENDER_WITH_MULTIPLE_PAINT_CALLS=1
+        JUCE_SILENCE_XCODE_15_LINKER_WARNING=1)
 
 target_link_libraries("${PROJECT_NAME}"
         PRIVATE
