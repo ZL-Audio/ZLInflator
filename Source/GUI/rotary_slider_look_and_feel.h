@@ -99,9 +99,14 @@ namespace zlinterface {
             } else {
                 g.setFont(labelArea.getHeight() * 0.6f);
             }
+            float value = label.getText().getFloatValue();
             juce::String labelToDisplay = juce::String(label.getText()).substring(0, 4);
-            if (labelToDisplay.contains(".")) {
+            if (value < 10000 && labelToDisplay.contains(".")) {
                 labelToDisplay = juce::String(label.getText()).substring(0, 5);
+            }
+            if (value > 10000) {
+                value = value / 1000;
+                labelToDisplay = juce::String(value).substring(0, 4) + "K";
             }
             g.drawSingleLineText(labelToDisplay,
                                  juce::roundToInt(center.x + g.getCurrentFont().getHorizontalScale()),
