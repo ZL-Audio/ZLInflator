@@ -145,6 +145,11 @@ jobs:
         codesign --force -s "${{ secrets.DEV_ID_APPLICATION}}" -v "${{ env.VST3_PATH }}" --deep --strict --options=runtime --timestamp
         codesign --force -s "${{ secrets.DEV_ID_APPLICATION}}" -v "${{ env.AU_PATH }}" --deep --strict --options=runtime --timestamp
 
+    - name: Set python to 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
     - name: Create DMG (macOS)
       if: ${{ matrix.name == 'macOS' }}
       run: |
