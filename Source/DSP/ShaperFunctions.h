@@ -112,7 +112,7 @@ namespace shaper {
         }
 
     private:
-        FloatType a, b, c, scale=1;
+        FloatType a, b, c, scale = 1;
 
         FloatType basic(FloatType x) const override { return scale * x * (1 + x * (c + x * (b + a * x))); }
 
@@ -144,9 +144,8 @@ namespace shaper {
     class SinShaper : public Shaper<FloatType> {
     public:
         void setParameters(FloatType curve, bool compensation) override {
-            curve = std::pow(curve, FloatType(0.427));
-            trueCurve = (curve * static_cast<FloatType>(0.999) + static_cast<FloatType>(0.001)) *
-                        juce::MathConstants<FloatType>::pi / 2;
+            trueCurve = (std::pow(curve, FloatType(0.427)) * static_cast<FloatType>(0.999) +
+                         static_cast<FloatType>(0.001)) * juce::MathConstants<FloatType>::pi / 2;
             b = -basic(0);
             k = FloatType(1) / (basic(1) + b);
             if (compensation) {
