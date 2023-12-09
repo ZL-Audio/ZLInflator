@@ -15,11 +15,14 @@ You should have received a copy of the GNU General Public License along with ZLI
 
 #include "../DSP/MeterSource.h"
 #include "../GUI/meter_component.h"
+#include "../GUI/button_component.h"
 #include "../GUI/interface_definitions.h"
+#include "../PluginProcessor.h"
+#include "panel_definitions.h"
 
 class MeterPanel : public juce::Component {
 public:
-    explicit MeterPanel(MeterSource<float> *input, MeterSource<float> *output, zlinterface::UIBase &base);
+    explicit MeterPanel(ZLInflatorAudioProcessor &p, zlinterface::UIBase &base);
 
     ~MeterPanel() override;
 
@@ -30,6 +33,10 @@ public:
 private:
     zlinterface::MeterBackgroundComponent inputBackground, outputBackground;
     zlinterface::MeterComponent inputMeter, outputMeter;
+
+    std::unique_ptr<zlinterface::ButtonComponent> compensationButton;
+    std::array<std::unique_ptr<zlinterface::ButtonComponent> *, 1> buttonList{&compensationButton};
+    juce::OwnedArray<juce::AudioProcessorValueTreeState::ButtonAttachment> buttonAttachments;
 };
 
 

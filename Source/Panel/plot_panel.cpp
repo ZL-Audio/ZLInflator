@@ -13,9 +13,8 @@ You should have received a copy of the GNU General Public License along with ZLI
 #include "plot_panel.h"
 
 PlotPanel::PlotPanel(ZLInflatorAudioProcessor &p,
-                     shaper::ShaperMixer<float> *shaperMixer,
                      zlinterface::UIBase &base) :
-        shaperPlotComponent(shaperMixer, base) {
+        shaperPlotComponent(p.getShaperMixer(), base) {
     processorRef = &p;
     addAndMakeVisible(shaperPlotComponent);
 

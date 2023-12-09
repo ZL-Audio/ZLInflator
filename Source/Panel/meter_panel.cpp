@@ -12,15 +12,19 @@ You should have received a copy of the GNU General Public License along with ZLI
 
 #include "meter_panel.h"
 
-MeterPanel::MeterPanel(MeterSource<float> *input, MeterSource<float> *output, zlinterface::UIBase &base) :
+MeterPanel::MeterPanel(ZLInflatorAudioProcessor &p, zlinterface::UIBase &base) :
         inputBackground("IN", base),
         outputBackground("OUT", base),
-        inputMeter(input, -40.0f, 0.0f, base),
-        outputMeter(output, -40.0f, 0.0f, base) {
+        inputMeter(p.getInputMeterSource(), -40.0f, 0.0f, base),
+        outputMeter(p.getOutputMeterSource(), -40.0f, 0.0f, base) {
     addAndMakeVisible(inputBackground);
     addAndMakeVisible(outputBackground);
     addAndMakeVisible(inputMeter);
     addAndMakeVisible(outputMeter);
+
+    // init buttons
+    std::array<std::string, 1> buttonID{zldsp::autoGain::ID};
+    zlpanel::attachButtons(*this, buttonList, buttonAttachments, buttonID, p.parameters, base);
 }
 
 MeterPanel::~MeterPanel() = default;
@@ -29,6 +33,9 @@ void MeterPanel::paint(juce::Graphics &) {}
 
 void MeterPanel::resized() {
     auto bound = getLocalBounds().toFloat();
+    auto buttonBound = bound.removeFromTop(bound.getHeight() * 0.2f);
+    buttonBound = buttonBound.withSizeKeepingCentre(buttonBound.getWidth() * 0.8333f, buttonBound.getHeight());
+    compensationButton->setBounds(buttonBound.toNearestInt());
     auto inputBound = bound.removeFromLeft(bound.getWidth() * 0.5f);
     inputBackground.setBounds(inputBound.toNearestInt());
     outputBackground.setBounds(bound.toNearestInt());

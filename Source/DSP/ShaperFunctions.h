@@ -23,7 +23,7 @@ namespace shaper {
         quadratic,
         cubic,
         quartic,
-        sigmod,
+//        sigmod,
         sin,
         ShaperNUM
     };
@@ -39,7 +39,7 @@ namespace shaper {
             return shape(x);
         }
 
-        virtual void setParameters(FloatType curve) = 0;
+        virtual void setParameters(FloatType curve, bool compensation) = 0;
 
     private:
         virtual FloatType basic(FloatType x) const = 0;
@@ -50,7 +50,7 @@ namespace shaper {
     template<typename FloatType>
     class IdentityShaper : public Shaper<FloatType> {
     public:
-        void setParameters(FloatType) override {}
+        void setParameters(FloatType, bool) override {}
 
     private:
         FloatType basic(FloatType x) const override { return x; }
@@ -61,10 +61,18 @@ namespace shaper {
     template<typename FloatType>
     class QuadraticShaper : public Shaper<FloatType> {
     public:
-        void setParameters(FloatType) override {}
+        void setParameters(FloatType, bool compensation) override {
+            if (compensation) {
+                scale = 1 / FloatType(1.6859899352913437);
+            } else {
+                scale = 1;
+            }
+        }
 
     private:
-        FloatType basic(FloatType x) const override { return x * (2 - x); }
+        FloatType scale = 1;
+
+        FloatType basic(FloatType x) const override { return scale * x * (2 - x); }
 
         FloatType shape(FloatType x) const override { return basic(x); }
     };
@@ -72,10 +80,18 @@ namespace shaper {
     template<typename FloatType>
     class CubicShaper : public Shaper<FloatType> {
     public:
-        void setParameters(FloatType) override {}
+        void setParameters(FloatType, bool compensation) override {
+            if (compensation) {
+                scale = 1 / FloatType(1.1338666988243666);
+            } else {
+                scale = 1;
+            }
+        }
 
     private:
-        FloatType basic(FloatType x) const override { return x * (1 + x * (1 - x)); }
+        FloatType scale = 1;
+
+        FloatType basic(FloatType x) const override { return scale * x * (1 + x * (1 - x)); }
 
         FloatType shape(FloatType x) const override { return basic(x); }
     };
@@ -83,60 +99,71 @@ namespace shaper {
     template<typename FloatType>
     class QuarticShaper : public Shaper<FloatType> {
     public:
-        void setParameters(FloatType curve) override {
+        void setParameters(FloatType curve, bool compensation) override {
             curve = -6 + 6 * curve;
             a = (4 + curve) / 2;
             b = -5 - curve;
             c = (6 + curve) / 2;
+            if (compensation) {
+                scale = 1 / (FloatType(0.04141008663761537) * curve + FloatType(1.3021255219869479));
+            } else {
+                scale = 1;
+            }
         }
 
     private:
-        FloatType a, b, c;
-        FloatType basic(FloatType x) const override { return x * (1 + x * (c + x * (b + a * x))); }
+        FloatType a, b, c, scale=1;
+
+        FloatType basic(FloatType x) const override { return scale * x * (1 + x * (c + x * (b + a * x))); }
 
         FloatType shape(FloatType x) const override { return basic(x); }
     };
 
-    template<typename FloatType>
-    class SigmodShaper : public Shaper<FloatType> {
-    public:
-        void setParameters(FloatType curve) override {
-            trueCurve = curve * FloatType(2.5) + FloatType(0.5);
-            b = -basic(0);
-            k = FloatType(1) / (basic(1) + b);
-        }
-
-    private:
-        FloatType trueCurve, k, b;
-
-        FloatType basic(FloatType x) const override {
-            return FloatType(1) / (1 + std::exp(-trueCurve * x));
-        }
-
-        FloatType shape(FloatType x) const override {
-            return k * (basic(x) + b);
-        }
-    };
+//    template<typename FloatType>
+//    class SigmodShaper : public Shaper<FloatType> {
+//    public:
+//        void setParameters(FloatType curve) override {
+//            trueCurve = curve * FloatType(2.5) + FloatType(0.5);
+//            b = -basic(0);
+//            k = FloatType(1) / (basic(1) + b);
+//        }
+//
+//    private:
+//        FloatType trueCurve, k, b;
+//
+//        FloatType basic(FloatType x) const override {
+//            return FloatType(1) / (1 + std::exp(-trueCurve * x));
+//        }
+//
+//        FloatType shape(FloatType x) const override {
+//            return k * (basic(x) + b);
+//        }
+//    };
 
     template<typename FloatType>
     class SinShaper : public Shaper<FloatType> {
     public:
-        void setParameters(FloatType curve) override {
+        void setParameters(FloatType curve, bool compensation) override {
             trueCurve = (curve * static_cast<FloatType>(0.999) + static_cast<FloatType>(0.001)) *
                         juce::MathConstants<FloatType>::pi / 2;
             b = -basic(0);
             k = FloatType(1) / (basic(1) + b);
+            if (compensation) {
+                scale = 1 / (FloatType(0.44059733535368345) * curve + FloatType(0.9191369981709274));
+            } else {
+                scale = 1;
+            }
         }
 
     private:
-        FloatType trueCurve, k, b;
+        FloatType trueCurve, k, b, scale = 1;
 
         FloatType basic(FloatType x) const override {
             return std::sin(x * trueCurve);
         }
 
         FloatType shape(FloatType x) const override {
-            return k * (basic(x) + b);
+            return scale * k * (basic(x) + b);
         }
     };
 
@@ -150,8 +177,8 @@ namespace shaper {
             return std::make_unique<CubicShaper<FloatType>>();
         } else if (type == ShaperType::quartic) {
             return std::make_unique<QuarticShaper<FloatType>>();
-        } else if (type == ShaperType::sigmod) {
-            return std::make_unique<SigmodShaper<FloatType>>();
+//        } else if (type == ShaperType::sigmod) {
+//            return std::make_unique<SigmodShaper<FloatType>>();
         } else {
             return std::make_unique<SinShaper<FloatType>>();
         }
@@ -167,7 +194,8 @@ namespace shaper {
             }
             setShapes(zldsp::curve1::formatV(zldsp::curve1::defaultV),
                       zldsp::curve2::formatV(zldsp::curve2::defaultV),
-                      zldsp::weight::formatV(zldsp::weight::defaultV));
+                      zldsp::weight::formatV(zldsp::weight::defaultV),
+                      false);
         }
 
         ~ShaperMixer() = default;
@@ -176,29 +204,18 @@ namespace shaper {
             return shape(x);
         }
 
-        void setShapes(FloatType curve1, FloatType curve2, FloatType weight) {
-            newFunction = true;
+        void setShapes(FloatType curve1, FloatType curve2, FloatType weight, bool compensation) {
             m_weight2 = weight;
             m_weight1 = static_cast<FloatType>(1) - weight;
             for (size_t i = 0; i < ShaperType::ShaperNUM; ++i) {
-                shaper1[i]->setParameters(curve1);
-                shaper2[i]->setParameters(curve2);
+                shaper1[i]->setParameters(curve1, compensation);
+                shaper2[i]->setParameters(curve2, compensation);
             }
         }
 
         void setTypes(size_t type1, size_t type2) {
-            newFunction = true;
             m_type1 = type1;
             m_type2 = type2;
-        }
-
-        bool hasNewFunction() {
-            if (newFunction) {
-                newFunction = false;
-                return true;
-            } else {
-                return false;
-            }
         }
 
     private:
@@ -206,7 +223,6 @@ namespace shaper {
         FloatType m_weight1, m_weight2;
         size_t m_type1 = static_cast<size_t>(zldsp::style1::defaultI);
         size_t m_type2 = static_cast<size_t>(zldsp::style2::defaultI);
-        std::atomic<bool> newFunction = true;
 
         FloatType shape(FloatType x) const {
             return (*shaper1[m_type1])(x) * m_weight1 + (*shaper2[m_type2])(x) * m_weight2;

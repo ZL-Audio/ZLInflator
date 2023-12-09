@@ -31,8 +31,8 @@ public:
         m_dry = static_cast<FloatType>(1) - wet;
     }
 
-    void setShapes(FloatType curve1, FloatType curve2, FloatType weight) {
-        shaperMixer.setShapes(curve1, curve2, weight);
+    void setShapes(FloatType curve1, FloatType curve2, FloatType weight, bool compensation) {
+        shaperMixer.setShapes(curve1, curve2, weight, compensation);
     }
 
     void setTypes(size_t type1, size_t type2) {
@@ -139,8 +139,8 @@ public:
         helper.setWet(wet);
     }
 
-    void setShapes(FloatType curve1, FloatType curve2, FloatType weight) {
-        helper.setShapes(curve1, curve2, weight);
+    void setShapes(FloatType curve1, FloatType curve2, FloatType weight, bool compensation) {
+        helper.setShapes(curve1, curve2, weight, compensation);
     }
 
     void setCutoffFrequency(FloatType lowFreq, FloatType highFreq) {
@@ -291,7 +291,7 @@ public:
         std::array IDs{zldsp::effectIn::ID, zldsp::style1::ID, zldsp::style2::ID,
                        zldsp::wet::ID, zldsp::curve1::ID, zldsp::curve2::ID, zldsp::weight::ID,
                        zldsp::bandSplit::ID, zldsp::lowSplit::ID, zldsp::highSplit::ID,
-                       zldsp::overSample::ID};
+                       zldsp::overSample::ID, zldsp::autoGain::ID};
         for (auto &ID: IDs) {
             apvts->addParameterListener(ID, this);
         }
@@ -301,20 +301,24 @@ public:
         if (parameterID == zldsp::wet::ID) {
             waveShaper->setWet(static_cast<FloatType>(newValue) / static_cast<FloatType>(100));
         } else if (parameterID == zldsp::curve1::ID || parameterID == zldsp::curve2::ID ||
-                   parameterID == zldsp::weight::ID) {
+                   parameterID == zldsp::weight::ID || parameterID == zldsp::autoGain::ID) {
             auto curve1 = apvts->getRawParameterValue(zldsp::curve1::ID)->load();
             auto curve2 = apvts->getRawParameterValue(zldsp::curve2::ID)->load();
             auto weight = apvts->getRawParameterValue(zldsp::weight::ID)->load();
+            auto compensation = static_cast<bool>(apvts->getRawParameterValue(zldsp::autoGain::ID)->load());
             if (parameterID == zldsp::curve1::ID) {
                 curve1 = newValue;
             } else if (parameterID == zldsp::curve2::ID) {
                 curve2 = newValue;
-            } else {
+            } else if (parameterID == zldsp::weight::ID) {
                 weight = newValue;
+            } else {
+                compensation = static_cast<bool>(newValue);
             }
             waveShaper->setShapes(static_cast<FloatType>(zldsp::curve1::formatV(curve1)),
                                   static_cast<FloatType>(zldsp::curve2::formatV(curve2)),
-                                  static_cast<FloatType>(zldsp::weight::formatV(weight)));
+                                  static_cast<FloatType>(zldsp::weight::formatV(weight)),
+                                  compensation);
         } else if (parameterID == zldsp::lowSplit::ID || parameterID == zldsp::highSplit::ID) {
             auto lowSplit = apvts->getRawParameterValue(zldsp::lowSplit::ID)->load();
             auto highSplit = apvts->getRawParameterValue(zldsp::highSplit::ID)->load();

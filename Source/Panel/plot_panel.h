@@ -21,7 +21,6 @@ class PlotPanel : public juce::Component, public juce::AudioProcessorValueTreeSt
                   private juce::AsyncUpdater {
 public:
     explicit PlotPanel(ZLInflatorAudioProcessor &p,
-                       shaper::ShaperMixer<float> *shaperMixer,
                        zlinterface::UIBase &base);
 
     ~PlotPanel() override;

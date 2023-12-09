@@ -139,6 +139,13 @@ namespace zldsp {
         auto static constexpr defaultV = false;
     };
 
+    class autoGain : public BoolParameters<autoGain> {
+    public:
+        auto static constexpr ID = "auto_gain";
+        auto static constexpr name = "Auto Gain";
+        auto static constexpr defaultV = false;
+    };
+
     // choices
     template<class T>
     class ChoiceParameters {
@@ -168,13 +175,13 @@ namespace zldsp {
     public:
         auto static constexpr ID = "style1";
         auto static constexpr name = "1st Style";
-        inline auto static const choices = juce::StringArray{"Identity", "Quadratic", "Cubic", "Quartic", "SigMOD", "SinMOD"};
+        inline auto static const choices = juce::StringArray{"Identity", "Quadratic", "Cubic", "Quartic", "SinMOD"};
         enum {
             Identity,
             Quadratic,
             Cubic,
             Quartic,
-            SigMOD,
+//            SigMOD,
             SinMOD,
             StyleNUM
         };
@@ -185,13 +192,13 @@ namespace zldsp {
     public:
         auto static constexpr ID = "style2";
         auto static constexpr name = "2nd Style";
-        inline auto static const choices = juce::StringArray{"Identity", "Quadratic", "Cubic", "Quartic", "SigMOD", "SinMOD"};
+        inline auto static const choices = juce::StringArray{"Identity", "Quadratic", "Cubic", "Quartic", "SinMOD"};
         enum {
             Identity,
             Quadratic,
             Cubic,
             Quartic,
-            SigMOD,
+//            SigMOD,
             SinMOD,
             StyleNUM
         };
@@ -203,7 +210,7 @@ namespace zldsp {
         layout.add(inputGain::get(), outputGain::get(), wet::get(),
                    curve1::get(), curve2::get(), weight::get(),
                    lowSplit::get(), highSplit::get(),
-                   effectIn::get(), bandSplit::get(),
+                   effectIn::get(), bandSplit::get(), autoGain::get(),
                    overSample::get(), style1::get(), style2::get());
         return layout;
     }

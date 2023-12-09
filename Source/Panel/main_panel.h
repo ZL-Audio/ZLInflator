@@ -22,10 +22,7 @@ You should have received a copy of the GNU General Public License along with ZLI
 
 class MainPanel : public juce::Component {
 public:
-    explicit MainPanel(ZLInflatorAudioProcessor &p,
-        MeterSource<float> *input,
-        MeterSource<float> *output,
-        shaper::ShaperMixer<float> *shaperMixer);
+    explicit MainPanel(ZLInflatorAudioProcessor &p);
 
     ~MainPanel() override;
 

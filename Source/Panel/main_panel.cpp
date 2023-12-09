@@ -12,15 +12,12 @@ You should have received a copy of the GNU General Public License along with ZLI
 
 #include "main_panel.h"
 
-MainPanel::MainPanel(ZLInflatorAudioProcessor &p,
-                     MeterSource<float> *input,
-                     MeterSource<float> *output,
-                     shaper::ShaperMixer<float> *shaperMixer) :
+MainPanel::MainPanel(ZLInflatorAudioProcessor &p) :
         uiBase(),
         controlPanel(p.parameters, uiBase),
         topPanel(p, uiBase),
-        meterPanel(input, output, uiBase),
-        plotPanel(p, shaperMixer, uiBase) {
+        meterPanel(p, uiBase),
+        plotPanel(p, uiBase) {
     addAndMakeVisible(controlPanel);
     addAndMakeVisible(topPanel);
     addAndMakeVisible(meterPanel);

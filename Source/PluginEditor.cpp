@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License along with ZLI
 ZLInflatorAudioProcessorEditor::ZLInflatorAudioProcessorEditor(ZLInflatorAudioProcessor &p) :
         AudioProcessorEditor(&p), processorRef(p),
         property(p.states),
-        mainPanel(p, p.getInputMeterSource(), p.getOutputMeterSource(), p.getShaperMixer()) {
+        mainPanel(p) {
 
     for (auto &ID: IDs) {
         processorRef.states.addParameterListener(ID, this);
