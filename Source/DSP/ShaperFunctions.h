@@ -63,7 +63,7 @@ namespace shaper {
     public:
         void setParameters(FloatType, bool compensation) override {
             if (compensation) {
-                scale = 1 / FloatType(1.6859899352913437);
+                scale = 1 / FloatType(1.7619606880293588);
             } else {
                 scale = 1;
             }
@@ -82,7 +82,7 @@ namespace shaper {
     public:
         void setParameters(FloatType, bool compensation) override {
             if (compensation) {
-                scale = 1 / FloatType(1.1338666988243666);
+                scale = 1 / FloatType(1.0982883051371357);
             } else {
                 scale = 1;
             }
@@ -105,7 +105,7 @@ namespace shaper {
             b = -5 - curve;
             c = (6 + curve) / 2;
             if (compensation) {
-                scale = 1 / (FloatType(0.04141008663761537) * curve + FloatType(1.3021255219869479));
+                scale = 1 / (FloatType(0.029832404608718992) * curve + FloatType(1.2211563052435235));
             } else {
                 scale = 1;
             }
@@ -144,12 +144,13 @@ namespace shaper {
     class SinShaper : public Shaper<FloatType> {
     public:
         void setParameters(FloatType curve, bool compensation) override {
+            curve = std::pow(curve, FloatType(0.427));
             trueCurve = (curve * static_cast<FloatType>(0.999) + static_cast<FloatType>(0.001)) *
                         juce::MathConstants<FloatType>::pi / 2;
             b = -basic(0);
             k = FloatType(1) / (basic(1) + b);
             if (compensation) {
-                scale = 1 / (FloatType(0.44059733535368345) * curve + FloatType(0.9191369981709274));
+                scale = 1 / (FloatType(0.48339138157922157) * curve + FloatType(0.9999698009251106));
             } else {
                 scale = 1;
             }
