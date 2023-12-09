@@ -34,8 +34,8 @@ public:
 private:
     ZLInflatorAudioProcessor *processorRef;
     zlinterface::ShaperPlotComponent shaperPlotComponent;
-    std::array<juce::String, 5> isPlotChangedParaIDs{zldsp::curve1::ID, zldsp::curve2::ID,
-                                                     zldsp::weight::ID,
+    std::array<juce::String, 6> isPlotChangedParaIDs{zldsp::curve1::ID, zldsp::curve2::ID,
+                                                     zldsp::weight::ID, zldsp::autoGain::ID,
                                                      zldsp::style1::ID, zldsp::style2::ID};
 
     void handleAsyncUpdate() override;

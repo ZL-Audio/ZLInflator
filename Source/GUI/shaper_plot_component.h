@@ -38,16 +38,17 @@ namespace zlinterface {
             auto bound = getLocalBounds().toFloat();
 
             juce::Path path0;
-            path0.startNewSubPath(getPointX(0, bound), getPointY(0, bound));
-            path0.lineTo(getPointX(1, bound), getPointY(1, bound));
+            path0.startNewSubPath(getPointX(xMin, bound), getPointY(yMin, bound));
+            path0.lineTo(getPointX(xMax, bound), getPointY(yMax, bound));
             g.setColour(uiBase->getTextHideColor());
             g.strokePath(path0, juce::PathStrokeType(thickNess, juce::PathStrokeType::curved));
 
             juce::Path path;
-            path.startNewSubPath(getPointX(0, bound), getPointY(0, bound));
+            path.startNewSubPath(getPointX(xMin, bound), getPointY(yMin, bound));
             for (int i = static_cast<int>(bound.getX()); i < static_cast<int>(bound.getX() + bound.getWidth()); ++i) {
                 auto x = getValueX(static_cast<float>(i), bound);
-                auto y = (*shaper)(x);
+                auto y = (*shaper)(juce::Decibels::decibelsToGain(x));
+                y = juce::Decibels::gainToDecibels(y);
                 path.lineTo(static_cast<float>(i), getPointY(y, bound));
             }
             g.setColour(uiBase->getTextColor());
@@ -57,8 +58,8 @@ namespace zlinterface {
     private:
         shaper::ShaperMixer<float> *shaper;
         UIBase *uiBase;
-        auto static constexpr xMin = 0.0f, xMax = 1.0f;
-        auto static constexpr yMin = 0.0f, yMax = 1.0f;
+        auto static constexpr xMin = -60.f, xMax = 0.f;
+        auto static constexpr yMin = -60.f, yMax = 0.f;
 
         static float getValueX(float posX, juce::Rectangle<float> bound) {
             return (posX - bound.getX()) / bound.getWidth() * (xMax - xMin) + xMin;
