@@ -58,8 +58,8 @@ namespace zlinterface {
     private:
         shaper::ShaperMixer<float> *shaper;
         UIBase *uiBase;
-        auto static constexpr xMin = -60.f, xMax = 0.f;
-        auto static constexpr yMin = -60.f, yMax = 0.f;
+        auto static constexpr xMin = -45.f, xMax = 0.f;
+        auto static constexpr yMin = -45.f, yMax = 0.f;
 
         static float getValueX(float posX, juce::Rectangle<float> bound) {
             return (posX - bound.getX()) / bound.getWidth() * (xMax - xMin) + xMin;
