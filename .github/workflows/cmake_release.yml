@@ -180,21 +180,21 @@ jobs:
 
     - name: Upload Exe (Windows)
       if: ${{ matrix.name == 'Windows' }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.INSTALLER_NAME }}.exe
         path: '${{ env.ARTIFACTS_PATH }}/${{ env.INSTALLER_NAME }}.exe'
 
     - name: Upload Zip (Linux)
       if: ${{ matrix.name == 'Linux' }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.INSTALLER_NAME }}.zip
         path: '${{ env.ARTIFACTS_PATH }}/${{ env.INSTALLER_NAME }}.zip'
 
     - name: Upload DMG (MacOS)
       if: ${{ matrix.name == 'macOS' }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.INSTALLER_NAME }}.dmg
         path: packaging/${{ env.INSTALLER_NAME }}.dmg
