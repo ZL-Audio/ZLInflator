@@ -219,9 +219,10 @@ jobs:
         mv "packaging/Output/${{ env.INSTALLER_NAME }}.exe" "${{ env.ARTIFACTS_PATH }}/"
 
     - name: Delete artifacts
-      uses: geekyeggo/delete-artifact@v2
+      uses: geekyeggo/delete-artifact@v4
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         name: |
-          ${{ env.INSTALLER_NAME }}.zip
-          ${{ env.INSTALLER_NAME }}.exe
-          ${{ env.INSTALLER_NAME }}.dmg
+          ${{ env.ARTIFACT_NAME }}.zip
+          ${{ env.ARTIFACT_NAME }}.exe
+          ${{ env.ARTIFACT_NAME }}.dmg
