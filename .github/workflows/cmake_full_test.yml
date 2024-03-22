@@ -219,7 +219,7 @@ jobs:
         mv "packaging/Output/${{ env.INSTALLER_NAME }}.exe" "${{ env.ARTIFACTS_PATH }}/"
 
     - name: Delete artifacts
-      uses: geekyeggo/delete-artifact@v4
+      uses: geekyeggo/delete-artifact@v5
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: |
